@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About Us — Everly White</title>
+<meta name="description" content="Everly White — the light bearers of a cosmic luxe lifestyle. Our story, our studio, and the craft behind bold minimalism." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-100:#feeaeb; --pink-200:#fcd7dd; --pink-300:#f3acb4;
+    --brown:#8c4646; --beige-light:#fff9f5; --white:#ffffff;
+    --neutral-50:#f8f8f8; --neutral-100:#dbdbdb; --neutral-200:#919191;
+    --neutral-300:#5d5d5d; --neutral-400:#393939; --neutral-500:#1e1e1e;
+    --font-heading:'Cinzel', serif; --font-body:'EB Garamond', serif;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+  body{margin:0;background:var(--white);color:var(--neutral-500);font-family:var(--font-body);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--brown);outline-offset:3px;}
+  .container{max-width:1240px;margin:0 auto;padding:0 40px;}
+  @media(max-width:640px){.container{padding:0 22px;}}
+  h1,h2,h3,h4{margin:0;font-weight:400;text-wrap:balance;}
+  .eyebrow{font-family:var(--font-heading);font-weight:500;font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--brown);margin:0 0 14px;}
+  .btn{font-family:var(--font-heading);font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:15px 32px;border:1px solid var(--brown);color:var(--brown);display:inline-block;cursor:pointer;transition:background .25s,color .25s;}
+  .btn:hover{background:var(--brown);color:var(--beige-light);}
+  .btn-solid{background:var(--brown);color:var(--beige-light);}
+  .btn-solid:hover{opacity:.85;}
+  .glass{background:rgba(255,255,255,.58);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);border:1px solid rgba(255,255,255,.7);}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease;}
+  .reveal.is-visible{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;}}
+
+  .ribbon{position:fixed;left:0;top:46%;z-index:50;writing-mode:vertical-rl;background:var(--pink-200);color:var(--brown);font-family:var(--font-heading);font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:14px 8px;border-radius:0 6px 6px 0;}
+  @media(max-width:700px){.ribbon{display:none;}}
+  .announce{background:var(--beige-light);color:var(--neutral-400);text-align:center;font-family:var(--font-heading);font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:11px 16px;border-bottom:1px solid var(--neutral-100);}
+
+  header.site{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--neutral-100);}
+  .nav-row{max-width:1240px;margin:0 auto;padding:12px 40px 0;display:flex;justify-content:center;align-items:center;position:relative;}
+  .nav-row nav{display:flex;gap:24px;}
+  .nav-row nav a{font-family:var(--font-heading);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--neutral-400);}
+  .nav-row nav a:hover,.nav-row nav a[aria-current="page"]{color:var(--brown);}
+  .nav-icons{position:absolute;right:40px;top:9px;display:flex;gap:16px;align-items:center;}
+  .nav-icons svg{width:17px;height:17px;fill:none;stroke:var(--neutral-400);stroke-width:1.4;}
+  .cart-count{position:relative;}
+  .cart-count b{position:absolute;top:-7px;right:-9px;background:var(--brown);color:var(--beige-light);font-family:var(--font-heading);font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .hamburger{display:none;background:none;border:none;padding:0;cursor:pointer;}
+  .hamburger svg{width:20px;height:20px;stroke:var(--neutral-400);stroke-width:1.4;fill:none;}
+  .mobile-menu{display:none;flex-direction:column;padding:6px 20px 18px;border-top:1px solid var(--neutral-100);background:var(--white);}
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{padding:12px 0;font-family:var(--font-heading);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral-400);border-bottom:1px solid var(--neutral-100);}
+  .mobile-menu a[aria-current="page"]{color:var(--brown);}
+  @media(max-width:860px){.nav-row nav{display:none;}.hamburger{display:flex;}.nav-row{padding:12px 20px 0;}.nav-icons{right:20px;}}
+  @media(min-width:861px){.mobile-menu{display:none!important;}}
+  .logo-row{display:flex;justify-content:center;padding:14px 40px 16px;}
+  .logo-row .wordmark{font-family:var(--font-heading);font-size:20px;letter-spacing:.32em;text-transform:uppercase;color:var(--neutral-500);}
+  .dropdown{position:relative;}
+  .dropdown-panel{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:10px;min-width:200px;padding:14px 0;display:none;flex-direction:column;z-index:5;}
+  .dropdown:hover .dropdown-panel{display:flex;}
+  .dropdown-panel a{padding:8px 20px;font-size:11px;justify-content:flex-start;display:block;}
+
+  /* ---------- Hero ---------- */
+  .hero{position:relative;min-height:640px;display:flex;align-items:flex-end;overflow:hidden;
+    background:linear-gradient(135deg,var(--pink-100) 0%, var(--pink-200) 45%, #f0c1b4 100%);
+    padding:60px 0 60px;
+  }
+  @media(max-width:640px){.hero{min-height:520px;}}
+  .hero-deco{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;}
+  .hero-inner{position:relative;width:100%;}
+  .hero-card{max-width:420px;padding:38px 42px;margin-left:6vw;}
+  @media(max-width:640px){.hero-card{margin:0 22px;max-width:none;}}
+  .hero-card h1{font-family:var(--font-heading);font-size:clamp(30px,4.4vw,44px);color:var(--neutral-500);margin-bottom:14px;}
+  .hero-card p{font-family:var(--font-body);font-style:italic;color:var(--neutral-400);margin:0;max-width:36ch;}
+  .hero-note{position:absolute;right:6vw;bottom:16px;font-family:var(--font-body);font-style:italic;font-size:12px;color:var(--neutral-400);background:rgba(255,255,255,.55);padding:5px 14px;border-radius:20px;}
+  @media(max-width:640px){.hero-note{position:static;display:inline-block;margin:16px 22px 0;}}
+
+  /* ---------- Intro split ---------- */
+  .intro{padding:100px 0;}
+  .intro-head h2{font-family:var(--font-heading);font-weight:600;font-size:clamp(24px,3.2vw,34px);line-height:1.3;max-width:20ch;margin-bottom:56px;}
+  .intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:8vw;}
+  @media(max-width:760px){.intro-grid{grid-template-columns:1fr;gap:40px;}}
+  .intro-col h4{font-family:var(--font-heading);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral-500);margin-bottom:16px;}
+  .intro-col p{color:var(--neutral-300);margin:0 0 14px;}
+  .badge-row{display:flex;gap:34px;margin-top:26px;flex-wrap:wrap;}
+  .badge{display:flex;align-items:center;gap:12px;}
+  .badge svg{width:26px;height:26px;stroke:var(--brown);fill:none;stroke-width:1.3;flex:none;}
+  .badge span{font-family:var(--font-heading);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--neutral-500);}
+
+  /* ---------- Video / quote band ---------- */
+  .quote-band{padding:0 0 110px;}
+  .quote-panel{position:relative;display:grid;grid-template-columns:1fr 1.4fr;min-height:280px;overflow:hidden;
+    background:linear-gradient(120deg,var(--pink-100) 0%, var(--pink-200) 55%, #f0c1b4 100%);
+  }
+  @media(max-width:760px){.quote-panel{grid-template-columns:1fr;}}
+  .quote-copy{display:flex;align-items:center;padding:50px 46px;}
+  .quote-copy .box{max-width:300px;}
+  .quote-copy p.quote-text{font-family:var(--font-body);font-style:italic;color:var(--neutral-500);font-size:16.5px;margin:0;line-height:1.6;}
+  .video-slot{position:relative;display:flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,.5);}
+  @media(max-width:760px){.video-slot{border-left:none;border-top:1px solid rgba(255,255,255,.5);min-height:220px;}}
+  .video-slot .play{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px;}
+  .video-slot .play svg{width:20px;height:20px;fill:var(--brown);margin-left:3px;}
+  .video-slot .vlabel{font-family:var(--font-heading);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--neutral-500);}
+  .video-stack{display:flex;flex-direction:column;align-items:center;}
+  .video-note{position:absolute;bottom:14px;right:18px;font-size:11px;font-style:italic;color:var(--neutral-400);}
+
+  /* ---------- Studio card ---------- */
+  .studio{padding:0 0 110px;}
+  .studio-card{background:var(--beige-light);border:1px solid var(--neutral-100);display:grid;grid-template-columns:.9fr 1.1fr;overflow:hidden;}
+  @media(max-width:860px){.studio-card{grid-template-columns:1fr;}}
+  .studio-media{position:relative;background:linear-gradient(160deg,var(--pink-100),var(--pink-200) 55%,#eec2b6);min-height:420px;display:flex;align-items:center;justify-content:center;}
+  .studio-media svg{width:52%;height:52%;stroke:var(--brown);opacity:.9;}
+  .studio-body{padding:56px 54px;}
+  @media(max-width:640px){.studio-body{padding:36px 26px;}}
+  .studio-body h3{font-family:var(--font-heading);font-size:clamp(22px,2.6vw,28px);margin-bottom:22px;}
+  .studio-body p{color:var(--neutral-300);margin:0 0 16px;max-width:52ch;}
+  .studio-label{font-family:var(--font-heading);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--neutral-500);margin:34px 0 16px;display:block;}
+  .gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .g-tile{aspect-ratio:1/1;background:linear-gradient(155deg,var(--pink-100),var(--pink-200));display:flex;align-items:center;justify-content:center;}
+  .g-tile svg{width:34%;height:34%;stroke:var(--brown);opacity:.75;}
+  .g-tile:nth-child(2n){background:linear-gradient(155deg,var(--beige-light),var(--pink-100));}
+  .studio-social{display:flex;gap:12px;margin-top:8px;}
+  .studio-social a{width:32px;height:32px;border:1px solid var(--neutral-100);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .studio-social svg{width:13px;height:13px;fill:var(--brown);}
+
+  /* ---------- Core Values ---------- */
+  .values{padding:0 0 110px;text-align:center;}
+  .values .section-head{max-width:560px;margin:0 auto 50px;}
+  .values .section-head h2{font-family:var(--font-heading);font-size:clamp(24px,3.2vw,34px);}
+  .values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--neutral-100);}
+  @media(max-width:760px){.values-grid{grid-template-columns:1fr;}}
+  .value-card{padding:50px 38px;text-align:left;border-right:1px solid var(--neutral-100);}
+  .value-card:last-child{border-right:none;}
+  @media(max-width:760px){.value-card{border-right:none;border-bottom:1px solid var(--neutral-100);}}
+  .value-card.featured{background:var(--pink-200);}
+  .value-card svg{width:30px;height:30px;stroke:var(--brown);fill:none;stroke-width:1.3;margin-bottom:22px;}
+  .value-card h3{font-family:var(--font-heading);font-size:14.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+  .value-card p{color:var(--neutral-300);font-size:14.5px;margin:0;}
+
+  /* ---------- Commitment band ---------- */
+  .commitment{padding:100px 0;background:linear-gradient(120deg,var(--pink-100) 0%, var(--pink-200) 60%, #f0c1b4 100%);}
+  .commitment-grid{display:grid;grid-template-columns:1fr 1fr;gap:6vw;align-items:center;}
+  @media(max-width:860px){.commitment-grid{grid-template-columns:1fr;gap:50px;}}
+  .commitment-copy h2{font-family:var(--font-heading);font-size:clamp(24px,3.2vw,34px);line-height:1.28;margin-bottom:22px;max-width:14ch;}
+  .commitment-copy p{color:var(--neutral-400);margin:0 0 22px;max-width:48ch;}
+  .commitment-copy a.learn{font-family:var(--font-heading);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brown);border-bottom:1px solid var(--brown);}
+  .commitment-visual{position:relative;height:340px;}
+  @media(max-width:860px){.commitment-visual{height:280px;}}
+  .commitment-visual .base{position:absolute;left:0;top:0;width:74%;height:78%;background:linear-gradient(150deg,var(--beige-light),var(--pink-100));}
+  .commitment-visual .overlap{position:absolute;right:0;bottom:0;width:52%;height:56%;background:linear-gradient(150deg,#f0c1b4,var(--pink-200));box-shadow:0 16px 34px rgba(120,60,50,.16);}
+  .commitment-visual svg{position:absolute;width:30%;height:30%;stroke:var(--brown);opacity:.85;}
+  .commitment-visual .base svg{top:20%;left:20%;}
+  .commitment-visual .overlap svg{bottom:20%;right:20%;}
+
+  /* ---------- CTA (light) ---------- */
+  .cta-light{padding:110px 0;text-align:center;background:var(--beige-light);border-top:1px solid var(--neutral-100);border-bottom:1px solid var(--neutral-100);}
+  .cta-light h2{font-family:var(--font-heading);font-size:clamp(26px,3.6vw,38px);color:var(--neutral-500);margin:0 auto 18px;max-width:16ch;}
+  .cta-light p{color:var(--neutral-300);max-width:52ch;margin:0 auto 34px;}
+  .cta-actions{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+
+  /* ---------- Trust bar ---------- */
+  .trust{padding:56px 0;background:var(--pink-100);}
+  .trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;text-align:center;}
+  @media(max-width:640px){.trust-grid{grid-template-columns:1fr;gap:34px;}}
+  .trust-item svg{width:26px;height:26px;stroke:var(--brown);fill:none;stroke-width:1.3;margin:0 auto 12px;}
+  .trust-item h4{font-family:var(--font-heading);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+  .trust-item p{color:var(--neutral-300);font-size:13.5px;margin:0;}
+
+  /* ---------- Footer ---------- */
+  footer.site{background:var(--pink-100);padding:70px 0 30px;}
+  .footer-top{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-bottom:40px;}
+  @media(max-width:700px){.footer-top{grid-template-columns:1fr 1fr;}}
+  @media(max-width:420px){.footer-top{grid-template-columns:1fr;}}
+  .foot-col h4{font-family:var(--font-heading);font-weight:500;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral-500);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14.5px;color:var(--neutral-300);margin-bottom:10px;}
+  .foot-col a:hover{color:var(--brown);}
+  .foot-social{display:flex;gap:10px;margin-top:6px;}
+  .foot-social a{width:30px;height:30px;border:1px solid var(--pink-300);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0;}
+  .foot-social svg{width:12px;height:12px;fill:var(--brown);}
+  .nl-form{display:flex;border:1px solid var(--pink-300);background:var(--white);margin-top:4px;}
+  .nl-form input{flex:1;border:none;background:transparent;padding:12px 14px;font-family:var(--font-body);font-size:14.5px;outline:none;color:var(--neutral-500);}
+  .nl-form button{border:none;background:var(--brown);color:var(--beige-light);font-family:var(--font-heading);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;padding:0 18px;cursor:pointer;}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;padding-top:26px;border-top:1px solid var(--pink-300);font-size:12.5px;color:var(--neutral-300);}
+</style>
+</head>
+<body>
+
+<div class="ribbon"><a href="index.html#testimonials" style="color:inherit;">Reviews</a></div>
+<div class="announce">Free Shipping on All Products Across India &nbsp;·&nbsp; Get 5% Off on Your First Purchase</div>
+
+<header class="site">
+  <div class="nav-row">
+    <nav aria-label="Primary">
+      <a href="index.html">Home</a>
+      <div class="dropdown">
+        <a href="index.html#collection">Collection ▾</a>
+        <div class="dropdown-panel glass">
+          <a href="index.html#collection">Collection 1 — Center of the Universe</a>
+          <a href="index.html#collection">Collection 2 — Coming Soon</a>
+        </div>
+      </div>
+      <a href="about-final.html" aria-current="page">About Us</a>
+      <a href="index.html#collection">Products</a>
+      <a href="index.html#journal">Blogs</a>
+      <a href="index.html#testimonials">Reviews</a>
+      <a href="#">FAQ</a>
+      <a href="#">Gifts</a>
+    </nav>
+    <div class="nav-icons">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.4-3.6 4.3-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg>
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg>
+      <span class="cart-count"><svg viewBox="0 0 24 24"><path d="M4 6h2l1.6 10.2A2 2 0 0 0 9.6 18h7.8a2 2 0 0 0 2-1.7L20.5 9H7"/><circle cx="10" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg><b>0</b></span>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+  </div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="index.html#collection">Collection</a>
+    <a href="about-final.html" aria-current="page">About Us</a>
+    <a href="index.html#collection">Products</a>
+    <a href="index.html#journal">Blogs</a>
+    <a href="index.html#testimonials">Reviews</a>
+    <a href="#">FAQ</a>
+    <a href="#">Gifts</a>
+  </nav>
+  <div class="logo-row"><a href="index.html" class="wordmark">Everly White</a></div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <svg class="hero-deco" viewBox="0 0 1200 640" fill="none" aria-hidden="true">
+    <circle cx="1020" cy="120" r="90" stroke="#ffffff" stroke-width="1" opacity="0.55"/>
+    <g fill="#8c4646" opacity="0.35">
+      <circle cx="70" cy="90" r="2"/><circle cx="130" cy="60" r="1.4"/><circle cx="40" cy="150" r="1.6"/>
+      <circle cx="150" cy="130" r="1.3"/><circle cx="90" cy="200" r="1.7"/>
+    </g>
+  </svg>
+  <div class="hero-inner">
+    <div class="hero-card glass reveal">
+      <p class="eyebrow">The House of Everly White</p>
+      <h1>About Us</h1>
+      <p>A longing — not for more things, but for meaning in the things we live with.</p>
+    </div>
+  </div>
+  <span class="hero-note">Lifestyle photography placeholder</span>
+</section>
+
+<!-- INTRO SPLIT -->
+<section class="intro">
+  <div class="container">
+    <div class="intro-head reveal">
+      <p class="eyebrow">Our Story</p>
+      <h2>Life extends far beyond the material.</h2>
+    </div>
+    <div class="intro-grid reveal">
+      <div class="intro-col">
+        <h4>The Philosophy</h4>
+        <p>Everly White was born from a longing — not for more things, but for meaning in the things we live with. We believe true richness is found beyond the material, in a deeper awareness of the universe and our place within it.</p>
+        <p>Every piece we create is a quiet invitation: to slow down, to notice, to connect with something larger than ourselves.</p>
+      </div>
+      <div class="intro-col">
+        <h4>The Craft</h4>
+        <p>True luxury is not just measured by what's around you — but by what's inside you. We favor bold minimalism, handmade imperfection, and patience over speed in every piece we create.</p>
+        <div class="badge-row">
+          <div class="badge">
+            <svg viewBox="0 0 24 24"><path d="M4 15c3-8 8-11 16-11-1 8-4 13-11 16Z"/></svg>
+            <span>100% Handcrafted</span>
+          </div>
+          <div class="badge">
+            <svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6Z"/></svg>
+            <span>Considered Materials</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE / VIDEO BAND -->
+<section class="quote-band">
+  <div class="container">
+    <div class="quote-panel reveal">
+      <div class="quote-copy">
+        <div class="box glass" style="padding:26px 28px;">
+          <p class="eyebrow">Creative Freedom</p>
+          <p class="quote-text">"Creativity is sacred freedom — not bound by trends, but guided by intuition." Limited, bespoke, and preserved in rarity.</p>
+        </div>
+      </div>
+      <div class="video-slot">
+        <div class="video-stack">
+          <span class="play glass"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7Z"/></svg></span>
+          <span class="vlabel">Brand Film</span>
+        </div>
+        <span class="video-note">Video placeholder</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STUDIO CARD -->
+<section class="studio" id="craft">
+  <div class="container">
+    <div class="studio-card reveal">
+      <div class="studio-media">
+        <svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="34" stroke-width="1"/><circle cx="50" cy="50" r="18" stroke-width="1"/><path d="M50 16v10M50 74v10M16 50h10M74 50h10" stroke-width="1"/></svg>
+      </div>
+      <div class="studio-body">
+        <p class="eyebrow">The Studio</p>
+        <h3>Mastery in Human Values &amp; Craftsmanship</h3>
+        <p>At Everly White, true luxury is not just measured by what's around you — but by what's inside you. Mastery, to us, is technique fused with values: bold minimalism, hand-shaped forms, and the discipline to let a piece take the time it needs.</p>
+        <p>Each Everly White piece is not only a reflection of artistry, but of humanity — a bridge between the seen and the unseen.</p>
+        <span class="studio-label">Gallery</span>
+        <div class="gallery-grid">
+          <div class="g-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg></div>
+          <div class="g-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="8"/></svg></div>
+          <div class="g-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M4 16c3-6 13-6 16 0"/><circle cx="12" cy="8" r="3"/></svg></div>
+          <div class="g-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3l2.5 5 5.5.8-4 4 1 5.5L12 16l-5 2.3 1-5.5-4-4 5.5-.8Z"/></svg></div>
+          <div class="g-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+          <div class="g-tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/></svg></div>
+        </div>
+        <span class="studio-label" style="margin-bottom:14px;">Follow the Studio</span>
+        <div class="studio-social">
+          <a href="https://www.instagram.com/everlywhitestudios/" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.97.24 2.43.4a4.9 4.9 0 0 1 1.77 1.15c.5.5.85 1.08 1.15 1.77.17.46.36 1.26.4 2.43.07 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.24 1.97-.4 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.46.17-1.26.36-2.43.4-1.25.07-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.97-.24-2.43-.4a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.17-.46-.36-1.26-.4-2.43C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.24-1.97.4-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.6 1.8c.46-.17 1.26-.36 2.43-.4C9.28 1.33 9.68 1.33 12 1.33Zm0 3.24a6.53 6.53 0 1 0 0 13.06 6.53 6.53 0 0 0 0-13.06Zm0 10.78a4.25 4.25 0 1 1 0-8.5 4.25 4.25 0 0 1 0 8.5Zm6.79-11.03a1.53 1.53 0 1 1-3.05 0 1.53 1.53 0 0 1 3.05 0Z"/></svg></a>
+          <a href="https://www.threads.net/@everlywhitestudios" aria-label="Threads"><svg viewBox="0 0 24 24"><path d="M16.5 11.4c-.2-3.5-2.2-5.6-5.6-5.6-2.1 0-3.8.9-4.8 2.5l1.7 1.2c.7-1 1.7-1.5 3-1.5 1.7 0 2.8.9 3.1 2.5-1-.2-2.1-.2-3.1 0-2.8.5-4.5 2-4.5 4.1 0 2.1 1.7 3.6 4.2 3.6 2.1 0 3.6-.9 4.4-2.6.4.4.7.9 1 1.6l1.8-.9c-.3-.8-.8-1.5-1.2-2 .2-.6.3-1.3.3-2 0-.3 0-.6-.3-.9Zm-5.4 4.4c-1.3 0-2.1-.6-2.1-1.5 0-1 .9-1.7 2.5-2 .5-.1 1.2-.1 2 0-.2 2.1-1.2 3.5-2.4 3.5Z"/></svg></a>
+          <a href="https://www.facebook.com/share/1Et5MhcvZV" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 21v-7.9h2.65l.4-3.08H13.5V8.05c0-.89.25-1.5 1.52-1.5h1.63V3.8c-.28-.04-1.25-.12-2.37-.12-2.35 0-3.96 1.43-3.96 4.06v2.27H7.65v3.08h2.67V21h3.18Z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE VALUES -->
+<section class="values" id="values">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">Core Values</p>
+      <h2>What we build our name on.</h2>
+    </div>
+    <div class="values-grid reveal">
+      <div class="value-card featured">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg>
+        <h3>Authenticity</h3>
+        <p>Genuine craftsmanship, made with an unwavering commitment to integrity — never a shortcut, never a substitute.</p>
+      </div>
+      <div class="value-card">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4" fill="var(--brown)" stroke="none"/></svg>
+        <h3>Exclusivity</h3>
+        <p>Created for those who feel it, not those chasing status — rarity as a form of respect for the wearer.</p>
+      </div>
+      <div class="value-card">
+        <svg viewBox="0 0 24 24"><path d="M4 16c3-6 13-6 16 0"/><circle cx="12" cy="8" r="3"/></svg>
+        <h3>Cosmic Luxe Experience</h3>
+        <p>Where esoteric wisdom meets artisanal mastery — luxury that is loud in the eyes, quiet in the essence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMITMENT -->
+<section class="commitment">
+  <div class="container">
+    <div class="commitment-grid reveal">
+      <div class="commitment-copy">
+        <p class="eyebrow">The Commitment</p>
+        <h2>Coming home to higher conscience.</h2>
+        <p>At Everly White, coming home means arriving at something deeper — not just material luxury, but a quiet return to yourself. We don't create for everyone; we create for those who feel it, and we hold every collection to that same quiet standard.</p>
+        <a class="learn" href="#craft">Learn More →</a>
+      </div>
+      <div class="commitment-visual">
+        <div class="base"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <div class="overlap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA (LIGHT) -->
+<section class="cta-light">
+  <div class="container reveal">
+    <p class="eyebrow" style="text-align:center;">Come Closer</p>
+    <h2>Step into the Cosmic Luxe Experience.</h2>
+    <p>We don't create for everyone. We create for those who feel it — join a small, intentional community built around pieces that mean something.</p>
+    <div class="cta-actions">
+      <a class="btn btn-solid" href="index.html#collection">Explore Products</a>
+      <a class="btn" href="https://www.instagram.com/everlywhitestudios/">Explore Our Community</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST BAR -->
+<section class="trust">
+  <div class="container">
+    <div class="trust-grid reveal">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg>
+        <h4>Handcrafted in India</h4>
+        <p>Every piece shaped by hand, never by machine.</p>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17.5" cy="18" r="1.6"/></svg>
+        <h4>Free Shipping</h4>
+        <p>Complimentary delivery across India.</p>
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg>
+        <h4>Limited Edition</h4>
+        <p>Small-batch collections, never mass produced.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="footer-top">
+      <div class="foot-col">
+        <h4>Shop</h4>
+        <a href="index.html#collection">Collection</a>
+        <a href="#">Gifts</a>
+        <a href="index.html#testimonials">Reviews</a>
+        <a href="index.html#collection">All Products</a>
+      </div>
+      <div class="foot-col">
+        <h4>Useful Links</h4>
+        <a href="#">FAQ</a>
+        <a href="#">Return Policy</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+      <div class="foot-col">
+        <h4>Connect</h4>
+        <a href="https://www.instagram.com/everlywhitestudios/">Instagram</a>
+        <a href="https://www.threads.net/@everlywhitestudios">Threads</a>
+        <a href="https://wa.me/message/OEJJOG6DF762J1">WhatsApp</a>
+        <div class="foot-social">
+          <a href="https://www.instagram.com/everlywhitestudios/" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.97.24 2.43.4a4.9 4.9 0 0 1 1.77 1.15c.5.5.85 1.08 1.15 1.77.17.46.36 1.26.4 2.43.07 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.24 1.97-.4 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.46.17-1.26.36-2.43.4-1.25.07-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.97-.24-2.43-.4a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.17-.46-.36-1.26-.4-2.43C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.24-1.97.4-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.6 1.8c.46-.17 1.26-.36 2.43-.4C9.28 1.33 9.68 1.33 12 1.33Zm0 3.24a6.53 6.53 0 1 0 0 13.06 6.53 6.53 0 0 0 0-13.06Zm0 10.78a4.25 4.25 0 1 1 0-8.5 4.25 4.25 0 0 1 0 8.5Zm6.79-11.03a1.53 1.53 0 1 1-3.05 0 1.53 1.53 0 0 1 3.05 0Z"/></svg></a>
+          <a href="https://wa.me/message/OEJJOG6DF762J1" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2.5A9.5 9.5 0 0 0 3.6 17l-1.1 4 4.1-1.1A9.5 9.5 0 1 0 12 2.5Zm5.5 13.4c-.2.6-1.3 1.2-1.9 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.6-.6-2.9-1.3-4.7-4.2-4.9-4.4-.1-.2-1.2-1.6-1.2-3 0-1.4.7-2.1 1-2.4.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5.2.6.7 1.9.8 2 .1.2.1.4 0 .6-.1.2-.2.3-.4.5-.2.2-.4.4-.5.6-.2.2-.4.4-.2.7.2.3.9 1.5 2 2.4 1.4 1.2 2.5 1.6 2.9 1.8.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.4-.2.7-.1.3.1 1.8.8 2.1 1 .3.1.5.2.6.3.1.2.1.9-.1 1.5Z"/></svg></a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h4>Newsletter</h4>
+        <p style="color:var(--neutral-300);font-size:13.5px;margin:0 0 12px;">Get 5% off your first order.</p>
+        <form class="nl-form" onsubmit="return false;">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit">Sign Up</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Everly White. All rights reserved.</span>
+      <span>Mastercard &middot; UPI &middot; Cash on Delivery</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+    }, {threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el=>el.classList.add('is-visible'));
+  }
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (hamburgerBtn && mobileMenu) hamburgerBtn.addEventListener('click', ()=> mobileMenu.classList.toggle('open'));
+</script>
+
+</body>
+</html>

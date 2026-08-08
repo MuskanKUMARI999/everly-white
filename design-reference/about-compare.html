@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About Us — Version Compare — Everly White</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-100:#feeaeb; --pink-200:#fcd7dd; --pink-300:#f3acb4;
+    --brown:#8c4646; --beige-light:#fff9f5; --white:#ffffff;
+    --neutral-100:#dbdbdb; --neutral-200:#919191; --neutral-300:#5d5d5d; --neutral-500:#1e1e1e;
+    --font-heading:'Cinzel', serif; --font-body:'EB Garamond', serif;
+    --bar-h:64px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--beige-light);font-family:var(--font-body);color:var(--neutral-500);}
+  .topbar{
+    position:fixed;top:0;left:0;right:0;z-index:100;height:var(--bar-h);
+    background:rgba(255,249,245,.94);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--neutral-100);
+    display:flex;align-items:center;gap:18px;padding:0 24px;
+  }
+  .topbar .brand{font-family:var(--font-heading);font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--neutral-500);white-space:nowrap;}
+  .tabs{display:flex;gap:8px;overflow-x:auto;flex:1;padding:4px 0;scrollbar-width:thin;}
+  .tabs::-webkit-scrollbar{height:4px;}
+  .tabs::-webkit-scrollbar-thumb{background:var(--pink-300);border-radius:10px;}
+  .tab{
+    flex:none;font-family:var(--font-heading);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    padding:9px 16px;border:1px solid var(--neutral-100);border-radius:20px;color:var(--neutral-300);
+    background:var(--white);cursor:pointer;transition:all .2s ease;white-space:nowrap;
+  }
+  .tab:hover{border-color:var(--pink-300);color:var(--brown);}
+  .tab.active{background:var(--brown);border-color:var(--brown);color:var(--beige-light);}
+  .tab.final{border-color:var(--brown);color:var(--brown);font-weight:600;}
+  .tab.final.active{background:var(--brown);color:var(--beige-light);}
+  .open-btn{
+    flex:none;font-family:var(--font-heading);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--brown);border:1px solid var(--brown);border-radius:20px;padding:9px 16px;
+    background:var(--white);cursor:pointer;white-space:nowrap;
+  }
+  .open-btn:hover{background:var(--brown);color:var(--beige-light);}
+  .frame-wrap{position:fixed;top:var(--bar-h);left:0;right:0;bottom:0;background:var(--white);}
+  iframe{width:100%;height:100%;border:none;display:block;}
+  .label-strip{
+    position:fixed;top:var(--bar-h);left:0;right:0;z-index:90;
+    text-align:center;padding:6px 0;font-family:var(--font-body);font-style:italic;font-size:12.5px;
+    color:var(--neutral-300);background:var(--pink-100);border-bottom:1px solid var(--pink-300);
+  }
+  @media(max-width:760px){
+    .topbar{flex-wrap:wrap;height:auto;padding:10px 16px;gap:10px;}
+    :root{--bar-h:104px;}
+    .topbar .brand{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="brand">Everly White — About Us</span>
+  <div class="tabs" id="tabs" role="tablist" aria-label="About Us versions"></div>
+  <a class="open-btn" id="openNew" href="#" target="_blank" rel="noopener">Open in New Tab ↗</a>
+</div>
+<div class="label-strip" id="labelStrip"></div>
+<div class="frame-wrap">
+  <iframe id="preview" title="About Us page preview"></iframe>
+</div>
+
+<script>
+  const versions = [
+    { key:'final',  label:'Final About Us',    file:'about-final.html',          note:'Recommended — composed from the approved reference layout, real site copy, light brand palette only.', final:true },
+    { key:'v1',     label:'Modern Minimal',     file:'about.html',                note:'Clean two-column editorial build on the brand system (Cinzel + EB Garamond, blush/brown palette).' },
+    { key:'v2',     label:'Editorial Folio',    file:'about-v2-folio.html',       note:'Magazine-style chaptered layout with a sticky roman-numeral chapter rail.' },
+    { key:'v3',     label:'Gallery Lookbook',   file:'about-v3-lookbook.html',    note:'Collage moodboard aesthetic — overlapping photo tiles, polaroids, masonry, postcard quote.' },
+    { key:'alt1',   label:'Ivory Triptych',     file:'about-alt1-triptych.html',  note:'From an earlier session — ivory/blush/ink identity with a philosophy triptych and collection filmstrip.' },
+    { key:'alt2',   label:'Statement Banner',   file:'about-alt2-statement.html', note:'From an earlier session — breadcrumb header, statement + process/values columns, full banner quote.' },
+    { key:'alt3',   label:'Founder Story',      file:'about-alt3-founder.html',   note:'From an earlier session — banner, About + video, a dedicated founder story section, and commitment band.' },
+  ];
+
+  const tabsEl = document.getElementById('tabs');
+  const frame = document.getElementById('preview');
+  const labelStrip = document.getElementById('labelStrip');
+  const openNew = document.getElementById('openNew');
+
+  versions.forEach(v=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (v.final ? ' final' : '');
+    btn.textContent = v.label;
+    btn.setAttribute('role','tab');
+    btn.addEventListener('click', ()=> select(v.key));
+    btn.dataset.key = v.key;
+    tabsEl.appendChild(btn);
+  });
+
+  function select(key){
+    const v = versions.find(x=>x.key===key);
+    if(!v) return;
+    frame.src = v.file;
+    openNew.href = v.file;
+    labelStrip.textContent = v.label + ' — ' + v.note;
+    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+    history.replaceState(null, '', '#'+key);
+  }
+
+  const initial = (location.hash || '#final').slice(1);
+  select(versions.some(v=>v.key===initial) ? initial : 'final');
+</script>
+
+</body>
+</html>

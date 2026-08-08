@@ -1,0 +1,25 @@
+/**
+ * The site's public origin, with no trailing slash.
+ *
+ * Read from NEXT_PUBLIC_SITE_URL so the sitemap, robots.txt and outgoing email all agree. On
+ * Netlify this MUST be https://everlywhite.com — left at the localhost default, a deployed sitemap
+ * would advertise localhost URLs to Google.
+ */
+export function siteUrl() {
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+}
+
+/**
+ * The only country this shop ships to.
+ *
+ * Not a preference — the site is India-only by construction: free shipping "across India", a
+ * 6-digit PIN rule at checkout, and GST invoices whose CGST/SGST-vs-IGST split is computed from a
+ * table of the 36 Indian states (an unrecognised state fails the invoice rather than guessing a
+ * tax split). The address book used to accept any country as free text, which produced saved
+ * addresses the shop could not ship, price or invoice.
+ *
+ * Both the saved-address record and the order's frozen shipping snapshot read this, so they can
+ * never disagree. Selling outside India is a business change, not a config change — shipping
+ * rules, postcode validation and non-GST invoicing would all need real work first.
+ */
+export const SHIPPING_COUNTRY = "India";

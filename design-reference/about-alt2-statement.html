@@ -1,0 +1,502 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">
+<title>About Us — Everly White</title>
+<style>
+  :root{
+    /* Same Everly White system used across our pages — ivory / blush / ink.
+       No dark-mode variant: kept single-theme, light, to match the brand. */
+    --ink:#1b1512;
+    --ink-soft:#3a2f2a;
+    --paper:#fff9f5;
+    --paper-deep:#fbf1ec;
+    --blush:#f3acb4;
+    --blush-pale:#fcd7dd;
+    --umber:#5e1f0d;
+    --stone:#6b5f5a;
+    --hair: rgba(27,21,18,.15);
+    --hair-soft: rgba(27,21,18,.08);
+    --maxw: 1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+  }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'EB Garamond', Georgia, 'Times New Roman', serif;
+    font-size:1.125rem;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{max-width:100%; display:block;}
+  a{color:inherit;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 clamp(1.25rem,4vw,3rem);}
+
+  .eyebrow{
+    font-family:'EB Garamond', serif;
+    font-weight:600;
+    font-size:.78rem;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:var(--umber);
+    margin:0 0 .9em;
+  }
+  h1,h2,h3{
+    font-family:'Cinzel', serif;
+    font-weight:500;
+    text-wrap:balance;
+    margin:0;
+    color:var(--ink);
+  }
+  h1{ font-size:clamp(2.1rem,5vw,3.6rem); line-height:1.16; letter-spacing:.01em;}
+  h2{ font-size:clamp(1.7rem,3.2vw,2.4rem); line-height:1.26; letter-spacing:.01em;}
+  h3{ font-size:1.02rem; letter-spacing:.14em; text-transform:uppercase; }
+  p{margin:0 0 1.1em;}
+  p:last-child{margin-bottom:0;}
+  .lede{ max-width:62ch; color:var(--ink-soft); }
+  .quote{ font-style:italic; font-weight:400; line-height:1.55; color:var(--ink); }
+  .rule{ height:1px; background:var(--hair); border:0; margin:0; }
+  .btn{
+    display:inline-flex; align-items:center; gap:.6em;
+    font-family:'EB Garamond', serif; font-weight:600;
+    font-size:.85rem; letter-spacing:.2em; text-transform:uppercase;
+    padding:.95em 2em;
+    border:1px solid currentColor;
+    text-decoration:none;
+    transition:background .35s ease, color .35s ease;
+    cursor:pointer;
+    background:transparent;
+  }
+  .btn-light{ color:var(--ink); border-color:var(--ink); }
+  .btn-light:hover{ background:var(--ink); color:var(--paper); }
+
+  .reveal{ opacity:0; transform:translateY(20px); transition:opacity .8s ease, transform .8s ease; }
+  .reveal.in{ opacity:1; transform:none; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,249,245,.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--hair-soft);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1.1rem clamp(1.25rem,4vw,3rem);
+    max-width:var(--maxw); margin:0 auto;
+  }
+  .wordmark{
+    font-family:'Cinzel', serif; font-weight:600;
+    font-size:1.15rem; letter-spacing:.22em;
+    text-decoration:none; color:var(--ink); white-space:nowrap;
+  }
+  .navlinks{
+    display:flex; gap:clamp(1rem,2.4vw,2rem); list-style:none; margin:0; padding:0;
+    font-size:.8rem; letter-spacing:.15em; text-transform:uppercase;
+  }
+  .navlinks a{ text-decoration:none; position:relative; padding-bottom:4px;}
+  .navlinks a::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:1px;
+    background:var(--umber); transform:scaleX(0); transform-origin:left;
+    transition:transform .3s ease;
+  }
+  .navlinks a:hover::after, .navlinks a.current::after{ transform:scaleX(1); }
+  .navlinks a.current{ color:var(--umber); }
+  .navicons{ display:flex; gap:1rem; align-items:center; }
+  .navicons svg{ width:18px; height:18px; }
+  @media (max-width:820px){ .navlinks{ display:none; } }
+
+  /* ---------- Breadcrumb + title band ---------- */
+  .titleband{
+    position:relative; min-height:340px; display:flex; align-items:flex-end;
+    background:linear-gradient(180deg, rgba(27,21,18,.35), rgba(27,21,18,.82)), var(--img-mastery) center 30%/cover no-repeat;
+    padding:2.4rem 0;
+  }
+  .crumb{
+    font-size:.78rem; letter-spacing:.14em; text-transform:uppercase; color:var(--blush-pale);
+    margin-bottom:1rem; display:flex; gap:.5em; align-items:center;
+  }
+  .crumb span{ opacity:.6; }
+  .titleband h1{ color:var(--paper); }
+
+  /* ---------- Statement + two column ---------- */
+  .statement{ padding:clamp(3.5rem,8vw,6rem) 0 clamp(2.5rem,5vw,3.5rem); }
+  .statement h2{ max-width:22ch; margin-bottom:2.2rem; }
+  .twocol{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(2rem,5vw,4rem); }
+  .twocol h3{ margin-bottom:.7rem; color:var(--umber); letter-spacing:.1em; }
+  .twocol p{ color:var(--ink-soft); }
+  @media (max-width:780px){ .twocol{ grid-template-columns:1fr; } }
+  .badgerow{ display:flex; gap:clamp(1.5rem,4vw,3rem); margin-top:2.4rem; flex-wrap:wrap; }
+  .badge{ display:flex; align-items:center; gap:.7rem; }
+  .badge svg{ width:26px; height:26px; color:var(--umber); flex:none; }
+  .badge span{ font-size:.85rem; letter-spacing:.06em; text-transform:uppercase; font-weight:600; color:var(--ink); }
+
+  /* ---------- Full image banner with quote ---------- */
+  .banner{ position:relative; }
+  .banner img{ width:100%; height:clamp(320px,46vw,520px); object-fit:cover; }
+  .banner-overlay{
+    position:absolute; inset:0; background:rgba(27,21,18,.42);
+    display:flex; align-items:center; justify-content:center; text-align:center; padding:2rem;
+  }
+  .banner-overlay p{ color:var(--paper); font-size:clamp(1.2rem,2.6vw,1.9rem); max-width:26ch; }
+
+  /* ---------- Stats row ---------- */
+  .stats{ padding:clamp(4rem,8vw,6rem) 0; }
+  .stats-inner{ display:grid; grid-template-columns:.7fr 1.3fr; gap:clamp(2rem,4vw,3.5rem); align-items:center; }
+  .stats-photo{ overflow:hidden; }
+  .stats-photo img{ width:100%; height:100%; object-fit:cover; aspect-ratio:4/5; }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.8rem,3vw,2.6rem); }
+  .stat-cell svg{ width:28px; height:28px; color:var(--umber); margin-bottom:.6rem; }
+  .stat-num{ font-family:'Cinzel',serif; font-size:2.4rem; color:var(--ink); line-height:1; margin-bottom:.4rem; }
+  .stat-cell h3{ margin-bottom:.4rem; font-size:.85rem; }
+  .stat-cell p{ font-size:.92rem; color:var(--stone); }
+  .stats-note{ margin-top:2rem; font-size:.85rem; font-style:italic; color:var(--stone); }
+  @media (max-width:820px){ .stats-inner{ grid-template-columns:1fr; } .stats-photo{ max-width:260px; } }
+
+  /* ---------- Meet the studio ---------- */
+  .studio{ padding:clamp(3rem,7vw,5rem) 0 clamp(4rem,8vw,6rem); }
+  .studio-head{ text-align:left; margin-bottom:clamp(2rem,4vw,3rem); }
+  .studio-frame{
+    border:1px solid var(--hair); padding:clamp(1.5rem,3vw,2.5rem);
+    display:grid; grid-template-columns:.82fr 1.18fr; gap:clamp(2rem,4vw,3.5rem);
+  }
+  .studio-photo{ overflow:hidden; }
+  .studio-photo img{ width:100%; height:100%; object-fit:cover; aspect-ratio:3/4; filter:grayscale(.12) sepia(.05); }
+  .studio-tag{ color:var(--umber); font-size:.75rem; letter-spacing:.28em; text-transform:uppercase; font-weight:600; margin-bottom:.7rem;}
+  .studio-name{ margin-bottom:1.1rem; font-size:clamp(1.9rem,4vw,2.7rem); }
+  .gallery-label,.social-label{ font-size:.75rem; letter-spacing:.24em; text-transform:uppercase; color:var(--stone); margin:2rem 0 .9rem; }
+  .gallery-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:.6rem; }
+  .gallery-grid a{ display:block; overflow:hidden; aspect-ratio:1; }
+  .gallery-grid img{ width:100%; height:100%; object-fit:cover; transition:transform .6s ease, filter .6s ease; filter:grayscale(.35); }
+  .gallery-grid a:hover img{ transform:scale(1.08); filter:grayscale(0); }
+  .social-row{ display:flex; gap:.9rem; }
+  .social-row a{ width:34px; height:34px; border:1px solid var(--hair); display:flex; align-items:center; justify-content:center; transition:background .3s ease,border-color .3s ease; text-decoration:none;}
+  .social-row a:hover{ background:var(--ink); border-color:var(--ink); }
+  .social-row a:hover svg{ stroke:var(--paper); }
+  .social-row svg{ width:15px; height:15px; stroke:var(--ink); transition:stroke .3s ease; }
+  @media (max-width:820px){ .studio-frame{ grid-template-columns:1fr; } }
+
+  /* ---------- Continuation two-col text ---------- */
+  .continuation{ padding:0 0 clamp(4rem,8vw,6rem); }
+  .continuation .twocol p{ font-size:1.02rem; }
+
+  /* ---------- Collection filmstrip (fixed grid) ---------- */
+  .collection{ padding:0 0 clamp(4rem,8vw,6rem); }
+  .collection-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:1.5rem; flex-wrap:wrap; margin-bottom:2rem; }
+  .film-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:.7rem; }
+  .film-cell{ position:relative; overflow:hidden; aspect-ratio:3/4; }
+  .film-cell img{ width:100%; height:100%; object-fit:cover; transition:transform .6s ease; }
+  .film-cell:hover img{ transform:scale(1.06); }
+  .film-cap{
+    position:absolute; left:0; right:0; bottom:0; padding:.6rem .7rem;
+    background:linear-gradient(0deg, rgba(27,21,18,.75), transparent);
+    color:var(--paper); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase;
+    opacity:0; transition:opacity .35s ease;
+  }
+  .film-cell:hover .film-cap{ opacity:1; }
+  @media (max-width:820px){ .film-grid{ grid-template-columns:repeat(2,1fr); } }
+
+  /* ---------- Values / benefits band ---------- */
+  .benefits{ background:var(--paper-deep); padding:clamp(3.5rem,7vw,5rem) 0; }
+  .benefit-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(2rem,4vw,3rem); }
+  .benefit svg{ width:32px; height:32px; color:var(--umber); margin-bottom:1rem; }
+  .benefit h3{ margin-bottom:.6rem; }
+  .benefit p{ color:var(--ink-soft); font-size:.98rem; }
+  .benefit .lead{ font-style:italic; color:var(--umber); margin-bottom:.4rem; }
+  @media (max-width:820px){ .benefit-grid{ grid-template-columns:1fr; max-width:480px; margin:0 auto; } }
+
+  /* ---------- Footer ---------- */
+  footer{ padding:clamp(3.5rem,6vw,4.5rem) 0 2.2rem; border-top:1px solid var(--hair); }
+  .foot-top{ display:flex; justify-content:space-between; gap:clamp(2rem,5vw,4rem); flex-wrap:wrap; margin-bottom:clamp(2.5rem,5vw,3.5rem); }
+  .foot-brand{ max-width:280px; }
+  .foot-brand .wordmark{ display:block; margin-bottom:1rem; }
+  .foot-brand p{ color:var(--stone); font-size:.92rem; }
+  .foot-cols{ display:flex; gap:clamp(2rem,5vw,3.5rem); flex-wrap:wrap; }
+  .foot-col h5{ font-family:'Cinzel',serif; font-size:.82rem; letter-spacing:.12em; text-transform:uppercase; margin:0 0 1rem; color:var(--ink); font-weight:500; }
+  .foot-col ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.6rem; }
+  .foot-col a{ text-decoration:none; color:var(--stone); font-size:.92rem; }
+  .foot-col a:hover{ color:var(--umber); }
+  .foot-bottom{ display:flex; justify-content:space-between; align-items:center; gap:1.5rem; flex-wrap:wrap; padding-top:2rem; border-top:1px solid var(--hair-soft); }
+  .foot-social{ display:flex; gap:.8rem; }
+  .foot-social a{ width:32px; height:32px; border:1px solid var(--hair); display:flex; align-items:center; justify-content:center; text-decoration:none; transition:background .3s ease,border-color .3s ease;}
+  .foot-social a:hover{ background:var(--ink); border-color:var(--ink); }
+  .foot-social a:hover svg{ stroke:var(--paper); }
+  .foot-social svg{ width:14px; height:14px; stroke:var(--ink); transition:stroke .3s ease; }
+  .foot-copy{ font-size:.82rem; color:var(--stone); }
+
+  section{ position:relative; }
+</style>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <nav class="nav">
+    <a href="#" class="wordmark">EVERLY WHITE</a>
+    <ul class="navlinks">
+      <li><a href="#">Home</a></li>
+      <li><a href="#">Collection</a></li>
+      <li><a href="#" class="current">About Us</a></li>
+      <li><a href="#">Products</a></li>
+      <li><a href="#">Blogs</a></li>
+      <li><a href="#">Reviews</a></li>
+      <li><a href="#">FAQ</a></li>
+      <li><a href="#">Gifts</a></li>
+    </ul>
+    <div class="navicons">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.6" y2="16.6"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M6 8V6a6 6 0 0112 0v2M4 8h16l-1.3 12.2A2 2 0 0117 22H7a2 2 0 01-2-1.8L4 8z"/></svg>
+    </div>
+  </nav>
+</header>
+
+<!-- ================= BREADCRUMB + TITLE ================= -->
+<section class="titleband" style="--img-mastery:url(data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E)">
+  <div class="wrap">
+    <p class="crumb reveal">Home <span>/</span> About Us</p>
+    <h1 class="reveal">About Us</h1>
+  </div>
+</section>
+
+<!-- ================= STATEMENT + PROCESS/VALUES ================= -->
+<section class="statement">
+  <div class="wrap">
+    <p class="eyebrow reveal">Our Story</p>
+    <h2 class="reveal">Born from a longing — not for more things, but for meaning.</h2>
+    <div class="twocol reveal">
+      <div>
+        <h3>Patience Over Speed</h3>
+        <p>In a world driven by speed, we choose patience. Each piece is hand-shaped, layer by layer, honoring the imperfection of the handmade rather than rushing toward the flawless.</p>
+      </div>
+      <div>
+        <h3>Values Before Technique</h3>
+        <p>At Everly White, true luxury is not just measured by what's around you — but by what's inside you. Mastery is technique fused with values, bold minimalism held to a quiet, exacting standard.</p>
+      </div>
+    </div>
+    <div class="badgerow reveal">
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M12 3v4M12 21v-4M4.2 7.8l3 2M16.8 14.2l3 2M4.2 16.2l3-2M16.8 9.8l3-2"/><circle cx="12" cy="12" r="3.2"/></svg>
+        <span>Hand-Shaped, Layer by Layer</span>
+      </div>
+      <div class="badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 12l6 6L20 6"/></svg>
+        <span>Limited, Bespoke Collections</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FULL BANNER WITH QUOTE ================= -->
+<section class="banner reveal">
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="An Everly White piece, hand finished in the studio">
+  <div class="banner-overlay">
+    <p class="quote">"At Everly White, true luxury is not just measured by what's around you — but by what's inside you."</p>
+  </div>
+</section>
+
+<!-- ================= STATS ================= -->
+<section class="stats">
+  <div class="wrap stats-inner">
+    <figure class="stats-photo reveal" style="margin:0;">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Everly White studio work in progress">
+    </figure>
+    <div class="reveal">
+      <div class="stat-grid">
+        <div class="stat-cell">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 3c-3 3-5 6-5 9a5 5 0 0010 0c0-3-2-6-5-9z"/></svg>
+          <p class="stat-num">—</p>
+          <h3>Seasonal Collections</h3>
+          <p>Released seasonally, in limited runs.</p>
+        </div>
+        <div class="stat-cell">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M7 21c0-4 2-7 5-9M7 21H4M7 21l3-3M12 12c3-1 6 0 8 2l-2 2c-2-1-4-1-6 0"/></svg>
+          <p class="stat-num">—</p>
+          <h3>Hand-Shaped Pieces</h3>
+          <p>Layer by layer, shaped by hand.</p>
+        </div>
+        <div class="stat-cell">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c1-3.5 3.5-5.5 7-5.5S18 16.5 19 20"/></svg>
+          <p class="stat-num">—</p>
+          <h3>Collector Community</h3>
+          <p>An intimate circle, not a crowd.</p>
+        </div>
+        <div class="stat-cell">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 21s-7-4.35-9.5-9C.7 8.3 3 5 6.2 5c2 0 3.4 1.1 5.8 3.5C14.4 6.1 15.8 5 17.8 5 21 5 23.3 8.3 21.5 12 19 16.65 12 21 12 21z"/></svg>
+          <p class="stat-num">—</p>
+          <h3>Studio Origin</h3>
+          <p>Founded on esoteric wisdom &amp; craft.</p>
+        </div>
+      </div>
+      <p class="stats-note">Figures to be added.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MEET THE STUDIO ================= -->
+<section class="studio">
+  <div class="wrap">
+    <div class="studio-head reveal">
+      <p class="eyebrow">Meet</p>
+      <h2>The Studio</h2>
+    </div>
+    <div class="studio-frame reveal">
+      <div class="studio-photo">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Hands shaping an Everly White piece at the wheel">
+      </div>
+      <div>
+        <p class="studio-tag">Studio</p>
+        <h2 class="studio-name">The Studio</h2>
+        <p class="lede">At Everly White, true luxury is not just measured by what's around you — but by what's inside you. Mastery, to us, is technique fused with values: bold minimalism, hand-shaped forms, and the discipline to let a piece take the time it needs.</p>
+        <p class="lede">Each Everly White piece is not only a reflection of artistry, but of humanity — a bridge between the seen and the unseen.</p>
+
+        <p class="gallery-label">Gallery</p>
+        <div class="gallery-grid">
+          <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Authenticity — Everly White studio work" loading="lazy"></a>
+          <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Creative freedom — Everly White studio work" loading="lazy"></a>
+          <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Exclusivity — Everly White studio work" loading="lazy"></a>
+          <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Butterfly Effect centerpiece" loading="lazy"></a>
+          <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Lunar Bond centerpiece" loading="lazy"></a>
+          <a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Everly White studio work" loading="lazy"></a>
+        </div>
+
+        <p class="social-label">Follow the Studio</p>
+        <div class="social-row">
+          <a href="https://www.facebook.com/share/1Et5MhcvZV" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h3l1-3h-4V9a1 1 0 011-1z"/></svg></a>
+          <a href="https://www.instagram.com/everlywhitestudios/" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.4"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/><circle cx="16.6" cy="7.4" r=".6" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://wa.me/message/OEJJOG6DF762J1" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.4"><path d="M4 20l1.3-3.8A8 8 0 1112 20a8 8 0 01-4.2-1.2L4 20z"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CONTINUATION TEXT ================= -->
+<section class="continuation">
+  <div class="wrap twocol reveal">
+    <div>
+      <h3>Creative Freedom</h3>
+      <p>Creativity, here, works without the constraints of trend — guided by intuition instead. "Each piece is a transmission — a quiet reflection of the soul behind it."</p>
+    </div>
+    <div>
+      <h3>The Cosmic Luxe Experience</h3>
+      <p>"At Everly White Studios, we celebrate the beauty of coming home — not just to material luxury, but to a space of higher conscience." Luxury, for us, is a silent dialogue between you and the universe.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COLLECTION FILMSTRIP ================= -->
+<section class="collection">
+  <div class="wrap">
+    <div class="collection-head reveal">
+      <div>
+        <p class="eyebrow">The Collection</p>
+        <h2>A few pieces from the studio.</h2>
+      </div>
+      <a href="#" class="btn btn-light">Explore Products</a>
+    </div>
+    <div class="film-grid reveal">
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Butterfly Effect centerpiece"><span class="film-cap">Butterfly Effect</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Lunar Bond centerpiece"><span class="film-cap">Lunar Bond</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Star Crossed Lovers centerpiece"><span class="film-cap">Star Crossed Lovers</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="String of Fate centerpiece"><span class="film-cap">String of Fate</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Everly White studio work"><span class="film-cap">Studio Work</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Everly White studio work"><span class="film-cap">Studio Work</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Everly White studio work"><span class="film-cap">Studio Work</span></div>
+      <div class="film-cell"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23feeaeb'/%3E%3Cstop offset='0.55' stop-color='%23fcd7dd'/%3E%3Cstop offset='1' stop-color='%23f3acb4'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='800' height='800' fill='url(%23g)'/%3E%3C/svg%3E" alt="Everly White studio work"><span class="film-cap">Studio Work</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= VALUES / BENEFITS BAND ================= -->
+<section class="benefits">
+  <div class="wrap benefit-grid reveal">
+    <div class="benefit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 21s-7-4.35-9.5-9C.7 8.3 3 5 6.2 5c2 0 3.4 1.1 5.8 3.5C14.4 6.1 15.8 5 17.8 5 21 5 23.3 8.3 21.5 12 19 16.65 12 21 12 21z"/></svg>
+      <h3>Authenticity</h3>
+      <p>Genuine craftsmanship and honest design reflect our commitment to integrity — a white swan as a pure canvas for the universe's language.</p>
+    </div>
+    <div class="benefit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M12 2l2.6 6.6L21 11l-6.4 2.4L12 20l-2.6-6.6L3 11l6.4-2.4z"/></svg>
+      <h3>Exclusivity</h3>
+      <p class="lead">"We don't create for everyone. We create for those who feel it."</p>
+      <p>Limited collections preserve rarity and an intimate collector community.</p>
+    </div>
+    <div class="benefit">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5c2 2.5 3 5.5 3 8.5s-1 6-3 8.5c-2-2.5-3-5.5-3-8.5s1-6 3-8.5z"/></svg>
+      <h3>Cosmic Luxe Experience</h3>
+      <p class="lead">"Luxury on a soul level — a silent dialogue between you and the universe."</p>
+      <p>Each piece carries a story of love, energy and conscience.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="#" class="wordmark">EVERLY WHITE</a>
+        <p>Luxury on a soul level — a silent dialogue between you and the universe.</p>
+      </div>
+      <div class="foot-cols">
+        <div class="foot-col">
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="#">FAQ</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Order Enquiries</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h5>Policies</h5>
+          <ul>
+            <li><a href="#">Return Policy</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms &amp; Conditions</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h5>About Us</h5>
+          <ul>
+            <li><a href="#">Blogs</a></li>
+            <li><a href="#">Our Story</a></li>
+            <li><a href="#">Loyalty Program</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <h5>Collections</h5>
+          <ul>
+            <li><a href="#">Center of the Universe</a></li>
+            <li><a href="#">All Products</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p class="foot-copy">© 2025 Everly White. All rights reserved.</p>
+      <div class="foot-social">
+        <a href="https://www.facebook.com/share/1Et5MhcvZV" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 9h3V6h-3a3 3 0 00-3 3v2H8v3h3v6h3v-6h3l1-3h-4V9a1 1 0 011-1z"/></svg></a>
+        <a href="https://www.instagram.com/everlywhitestudios/" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="4" y="4" width="16" height="16" rx="4"/><circle cx="12" cy="12" r="3.2"/></svg></a>
+        <a href="https://www.threads.net/@everlywhitestudios" aria-label="Threads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M12 3c4 0 7 2.2 7 6 0 2.6-1.8 4-3.6 4.5 2 .4 3.6 1.7 3.6 4 0 3.3-3 4.5-6.2 4.5-3 0-5.4-1-6.6-3"/></svg></a>
+        <a href="https://wa.me/message/OEJJOG6DF762J1" aria-label="WhatsApp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20l1.3-3.8A8 8 0 1112 20a8 8 0 01-4.2-1.2L4 20z"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var els = document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('in');}); return; }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){ entry.target.classList.add('in'); io.unobserve(entry.target); }
+      });
+    }, { threshold:.15 });
+    els.forEach(function(e){ io.observe(e); });
+  })();
+</script>

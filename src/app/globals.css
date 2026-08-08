@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand palette — extracted from design-reference/about-final.html (Figma source of truth) */
+  --color-pink-100: #feeaeb;
+  --color-pink-200: #fcd7dd;
+  --color-pink-300: #f3acb4;
+  --color-brown: #8c4646;
+  --color-terracotta: #9d5b52;
+  --color-beige-light: #fff9f5;
+  --color-neutral-50: #f8f8f8;
+  --color-neutral-100: #dbdbdb;
+  --color-neutral-200: #919191;
+  --color-neutral-300: #5d5d5d;
+  --color-neutral-400: #393939;
+  --color-neutral-500: #1e1e1e;
+}
+
+@theme inline {
+  --color-pink-100: var(--color-pink-100);
+  --color-pink-200: var(--color-pink-200);
+  --color-pink-300: var(--color-pink-300);
+  --color-brown: var(--color-brown);
+  --color-terracotta: var(--color-terracotta);
+  --color-beige-light: var(--color-beige-light);
+  --color-neutral-50: var(--color-neutral-50);
+  --color-neutral-100: var(--color-neutral-100);
+  --color-neutral-200: var(--color-neutral-200);
+  --color-neutral-300: var(--color-neutral-300);
+  --color-neutral-400: var(--color-neutral-400);
+  --color-neutral-500: var(--color-neutral-500);
+
+  --font-heading: var(--font-cinzel), serif;
+  --font-body: var(--font-eb-garamond), serif;
+
+  /* Figma canvas is 1440px; content sits in a 1240px column (100px gutters at 1440) */
+  --container-content: 1240px;
+}
+
+body {
+  background: var(--color-beige-light);
+  color: var(--color-neutral-500);
+  font-family: var(--font-body);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 400;
+    text-wrap: balance;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Periodic bell swing to draw attention to unread admin notifications
+   without shaking constantly — rings briefly, then rests. */
+@keyframes bell-ring {
+  0%,
+  62%,
+  100% {
+    transform: rotate(0deg);
+  }
+  64% {
+    transform: rotate(14deg);
+  }
+  66% {
+    transform: rotate(-12deg);
+  }
+  68% {
+    transform: rotate(10deg);
+  }
+  70% {
+    transform: rotate(-8deg);
+  }
+  72% {
+    transform: rotate(6deg);
+  }
+  74% {
+    transform: rotate(-4deg);
+  }
+  76%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-bell-ring {
+  transform-origin: 50% 0%;
+  animation: bell-ring 2.5s ease-in-out infinite;
+}

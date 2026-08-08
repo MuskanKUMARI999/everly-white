@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About Us — Everly White</title>
+<meta name="description" content="Everly White — the light bearers of a cosmic luxe lifestyle. Our story, our founder, and the craft behind bold minimalism." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink-100:#feeaeb; --pink-200:#fcd7dd; --pink-300:#f3acb4;
+    --brown:#8c4646; --beige-light:#fff9f5; --white:#ffffff;
+    --neutral-50:#f8f8f8; --neutral-100:#dbdbdb; --neutral-200:#919191;
+    --neutral-300:#5d5d5d; --neutral-400:#393939; --neutral-500:#1e1e1e;
+    --font-heading:'Cinzel', serif; --font-body:'EB Garamond', serif;
+    --fs-display-1:clamp(30px,4.4vw,44px); --fs-display-2:clamp(26px,3.4vw,36px);
+    --fs-body-lg:clamp(17px,1.6vw,19px); --fs-body:16px; --fs-body-sm:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+  body{margin:0;background:var(--white);color:var(--neutral-500);font-family:var(--font-body);font-weight:400;font-size:var(--fs-body);line-height:1.7;-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  .container{max-width:1240px;margin:0 auto;padding:0 40px;}
+  @media(max-width:640px){.container{padding:0 20px;}}
+  .eyebrow{font-family:var(--font-heading);font-weight:400;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--brown);margin:0 0 14px;}
+  h1,h2,h3{margin:0;text-wrap:balance;font-weight:400;}
+  .display-1{font-family:var(--font-heading);font-weight:400;font-size:var(--fs-display-1);line-height:1.2;}
+  .display-2{font-family:var(--font-heading);font-weight:400;font-size:var(--fs-display-2);line-height:1.22;}
+  .body-lg{font-size:var(--fs-body-lg);} .body-sm{font-size:var(--fs-body-sm);}
+  .section-head{max-width:640px;margin:0 auto 46px;text-align:center;}
+  .section-head p.lede{color:var(--neutral-300);margin:14px 0 0;}
+  .btn{font-family:var(--font-heading);font-weight:400;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:14px 30px;border:1px solid var(--brown);color:var(--brown);display:inline-block;cursor:pointer;transition:background .25s,color .25s;}
+  .btn:hover{background:var(--brown);color:var(--beige-light);}
+  .btn-solid{background:var(--brown);color:var(--beige-light);}
+  .btn-solid:hover{opacity:.85;background:var(--brown);}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--brown);outline-offset:3px;}
+
+  .glass{
+    background:rgba(255,255,255,.52);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
+    border:1px solid rgba(255,255,255,.65);
+  }
+
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s ease;}
+  .reveal.is-visible{opacity:1;transform:none;}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+
+  .ribbon{
+    position:fixed;left:0;top:46%;z-index:50;
+    writing-mode:vertical-rl;
+    background:var(--pink-200);color:var(--brown);
+    font-family:var(--font-heading);font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+    padding:14px 8px;border-radius:0 6px 6px 0;
+  }
+  @media(max-width:700px){.ribbon{display:none;}}
+
+  .announce{background:var(--beige-light);color:var(--neutral-400);text-align:center;font-family:var(--font-heading);font-weight:400;font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:11px 16px;border-bottom:1px solid var(--neutral-100);}
+
+  header.site{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--neutral-100);}
+  .nav-row{max-width:1240px;margin:0 auto;padding:12px 40px 0;display:flex;justify-content:center;align-items:center;position:relative;}
+  .nav-row nav{display:flex;gap:24px;}
+  .nav-row nav a{font-family:var(--font-heading);font-weight:400;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--neutral-400);display:flex;align-items:center;gap:4px;}
+  .nav-row nav a:hover,.nav-row nav a[aria-current="page"]{color:var(--brown);}
+  .nav-icons{position:absolute;right:40px;top:9px;display:flex;gap:16px;align-items:center;}
+  .nav-icons svg{width:17px;height:17px;fill:none;stroke:var(--neutral-400);stroke-width:1.4;}
+  .cart-count{position:relative;}
+  .cart-count b{position:absolute;top:-7px;right:-9px;background:var(--brown);color:var(--beige-light);font-family:var(--font-heading);font-size:9px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:400;}
+  .hamburger{display:none;background:none;border:none;padding:0;cursor:pointer;}
+  .hamburger svg{width:20px;height:20px;stroke:var(--neutral-400);stroke-width:1.4;fill:none;}
+  .mobile-menu{display:none;flex-direction:column;padding:6px 20px 18px;border-top:1px solid var(--neutral-100);background:var(--white);}
+  .mobile-menu.open{display:flex;}
+  .mobile-menu a{padding:12px 0;font-family:var(--font-heading);font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral-400);border-bottom:1px solid var(--neutral-100);}
+  .mobile-menu a:last-child{border-bottom:none;}
+  .mobile-menu a[aria-current="page"]{color:var(--brown);}
+  @media(max-width:860px){
+    .nav-row nav{display:none;}
+    .hamburger{display:flex;}
+    .nav-row{padding:12px 20px 0;}
+    .nav-icons{right:20px;}
+  }
+  @media(min-width:861px){.mobile-menu{display:none!important;}}
+  .logo-row{display:flex;justify-content:center;padding:14px 40px 16px;}
+  @media(max-width:640px){.logo-row{padding:14px 20px 16px;}}
+  .logo-row .wordmark{font-family:var(--font-heading);font-size:20px;letter-spacing:.32em;text-transform:uppercase;color:var(--neutral-500);}
+  .dropdown{position:relative;}
+  .dropdown-panel{position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:10px;min-width:200px;padding:14px 0;display:none;flex-direction:column;z-index:5;}
+  .dropdown:hover .dropdown-panel{display:flex;}
+  .dropdown-panel a{padding:8px 20px;font-size:11px;justify-content:flex-start;}
+
+  /* ---------- Page hero ---------- */
+  .page-hero{position:relative;}
+  .hero-media{width:100%;aspect-ratio:16/8;overflow:hidden;position:relative;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(255,255,255,.55), transparent 55%),
+      linear-gradient(135deg,var(--pink-100) 0%, var(--pink-200) 45%, #efc9bd 100%);
+  }
+  .hero-media svg{position:absolute;inset:0;width:100%;height:100%;opacity:.55;}
+  .hero-panel{position:absolute;left:5%;bottom:9%;max-width:440px;padding:38px 40px;}
+  @media(max-width:760px){.hero-panel{position:static;max-width:none;margin:-40px 16px 0;padding:30px 26px;background:var(--beige-light);}}
+  .hero-panel p.eyebrow{margin-bottom:12px;}
+  .hero-panel h1{color:var(--neutral-500);margin-bottom:14px;}
+  .hero-panel p.lede{font-family:var(--font-body);font-style:italic;color:var(--neutral-400);margin:0;max-width:38ch;}
+  .asset-note{position:absolute;right:16px;bottom:12px;font-family:var(--font-body);font-style:italic;font-size:12px;color:var(--neutral-400);background:rgba(255,255,255,.6);padding:4px 10px;border-radius:20px;}
+
+  /* ---------- Our Story ---------- */
+  .story{padding:100px 0;}
+  .story-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:7vw;align-items:center;}
+  @media(max-width:860px){.story-grid{grid-template-columns:1fr;gap:40px;}}
+  .story-visual{position:relative;aspect-ratio:3/4;overflow:hidden;background:linear-gradient(160deg,var(--beige-light),var(--pink-100) 60%,var(--pink-200));display:flex;align-items:center;justify-content:center;}
+  .story-visual svg{width:56%;height:56%;opacity:.9;stroke:var(--brown);}
+  .story-copy p{color:var(--neutral-300);max-width:56ch;margin:0 0 18px;}
+  .story-copy p.drop:first-letter{font-family:var(--font-heading);font-size:3.2rem;float:left;line-height:.78;padding:6px 10px 0 0;color:var(--brown);}
+
+  /* ---------- Founder ---------- */
+  .founder{padding:100px 0;background:var(--beige-light);}
+  .founder-grid{display:grid;grid-template-columns:.72fr 1.28fr;gap:7vw;align-items:center;}
+  @media(max-width:860px){.founder-grid{grid-template-columns:1fr;gap:44px;}}
+  .founder-portrait{position:relative;aspect-ratio:4/5;max-width:380px;}
+  @media(max-width:860px){.founder-portrait{margin:0 auto;}}
+  .founder-portrait .frame-back{position:absolute;inset:0;border:1px solid var(--pink-300);transform:translate(14px,14px);}
+  .founder-portrait .photo{position:relative;background:linear-gradient(160deg,var(--pink-100),var(--pink-200) 70%,#f0c6bb);width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+  .founder-portrait .initial{font-family:var(--font-heading);font-size:6rem;color:var(--brown);}
+  .founder-portrait figcaption{position:absolute;bottom:12px;left:12px;right:12px;font-size:11px;font-style:italic;color:var(--neutral-400);}
+  .founder-copy .founder-name{font-family:var(--font-body);font-style:italic;font-size:17px;color:var(--brown);margin:2px 0 24px;}
+  .founder-copy p{color:var(--neutral-300);max-width:58ch;margin:0 0 18px;}
+  .founder-quote{margin:30px 0;padding:28px 32px;text-align:left;}
+  .founder-quote p{font-family:var(--font-body);font-style:italic;font-size:20px;color:var(--neutral-500);margin:0;line-height:1.5;}
+  .placeholder-tag{display:inline-block;margin-top:8px;font-family:var(--font-body);font-style:italic;font-size:13px;color:var(--neutral-300);border-top:1px dashed var(--neutral-100);padding-top:14px;}
+
+  /* ---------- Craftsmanship (elevate pattern) ---------- */
+  .craft{padding:100px 0;}
+  .elevate-grid{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:36px;align-items:center;}
+  @media(max-width:900px){.elevate-grid{grid-template-columns:1fr;}}
+  .elevate-col{display:flex;flex-direction:column;gap:40px;}
+  .elevate-item{text-align:center;}
+  .elevate-item .icon{width:34px;height:34px;margin:0 auto 14px;stroke:var(--brown);fill:none;stroke-width:1.3;}
+  .elevate-item h4{font-family:var(--font-heading);font-weight:400;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--neutral-500);margin-bottom:8px;}
+  .elevate-item p{color:var(--neutral-300);font-size:14.5px;margin:0;}
+  .elevate-media{aspect-ratio:3/4;border-radius:4px;overflow:hidden;background:linear-gradient(150deg,var(--pink-200),var(--beige-light));display:flex;align-items:center;justify-content:center;}
+  .elevate-media svg{width:38%;height:38%;stroke:var(--brown);}
+
+  /* ---------- Creative Freedom (pattern-block overlay) ---------- */
+  .freedom{padding:0 0 100px;}
+  .pattern-block{position:relative;aspect-ratio:16/7;overflow:hidden;background:
+      radial-gradient(circle at 75% 30%, rgba(255,255,255,.5), transparent 45%),
+      linear-gradient(120deg,#efc9bd,var(--pink-200) 55%,var(--pink-100));
+  }
+  .pattern-block svg{position:absolute;inset:0;width:100%;height:100%;opacity:.5;}
+  .about-overlay{position:absolute;left:6%;top:50%;transform:translateY(-50%);max-width:420px;padding:34px 38px;text-align:left;}
+  .about-overlay p.eyebrow{margin-bottom:12px;}
+  .about-overlay p.quote{color:var(--neutral-500);font-style:italic;font-family:var(--font-body);margin:0;font-size:20px;line-height:1.5;}
+  @media(max-width:640px){.pattern-block{aspect-ratio:4/5;}.about-overlay{left:6%;right:6%;max-width:none;padding:24px 26px;}}
+
+  /* ---------- Core Values ---------- */
+  .values{padding:20px 0 110px;}
+  .values-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--neutral-100);border-left:1px solid var(--neutral-100);}
+  @media(max-width:760px){.values-grid{grid-template-columns:1fr;}}
+  .value-card{padding:48px 40px;border-right:1px solid var(--neutral-100);border-bottom:1px solid var(--neutral-100);text-align:center;transition:background .25s ease;}
+  .value-card:hover{background:var(--pink-100);}
+  .value-card svg{width:32px;height:32px;stroke:var(--brown);fill:none;stroke-width:1.3;margin:0 auto 22px;}
+  .value-card h3{font-family:var(--font-heading);font-weight:400;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--neutral-500);margin-bottom:12px;}
+  .value-card p{color:var(--neutral-300);font-size:14.5px;margin:0;}
+
+  /* ---------- Closing band ---------- */
+  .embrace{padding:90px 0 100px;text-align:center;background:var(--pink-200);}
+  .embrace h2{margin-bottom:16px;color:var(--neutral-500);}
+  .embrace p{color:var(--neutral-400);font-style:italic;font-family:var(--font-body);font-size:var(--fs-body-lg);max-width:44ch;margin:0 auto 30px;}
+  .embrace-actions{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;}
+
+  /* ---------- Footer ---------- */
+  footer.site{background:var(--white);padding:76px 0 30px;}
+  .footer-logo{text-align:center;margin-bottom:50px;font-family:var(--font-heading);font-size:18px;letter-spacing:.3em;text-transform:uppercase;color:var(--neutral-500);}
+  .footer-top{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding-bottom:44px;border-bottom:1px solid var(--neutral-100);max-width:820px;margin:0 auto;}
+  @media(max-width:640px){.footer-top{grid-template-columns:1fr 1fr;}}
+  .foot-col h4{font-family:var(--font-heading);font-weight:400;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--neutral-500);margin-bottom:16px;}
+  .foot-col a{display:block;font-size:14.5px;color:var(--neutral-300);margin-bottom:10px;}
+  .foot-col a:hover{color:var(--brown);}
+  .social-row{display:flex;gap:12px;justify-content:center;margin:34px 0 20px;}
+  .social-row a{width:32px;height:32px;border:1px solid var(--neutral-100);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  .social-row svg{width:13px;height:13px;fill:var(--brown);}
+  .footer-bottom{text-align:center;font-size:12.5px;color:var(--neutral-200);}
+</style>
+</head>
+<body>
+
+<div class="ribbon"><a href="index.html#testimonials" style="color:inherit;">Reviews</a></div>
+<div class="announce">Free Shipping on All Products Across India &nbsp;·&nbsp; Get 5% Off on Your First Purchase</div>
+
+<header class="site">
+  <div class="nav-row">
+    <nav aria-label="Primary">
+      <a href="index.html">Home</a>
+      <div class="dropdown">
+        <a href="index.html#collection">Collection ▾</a>
+        <div class="dropdown-panel glass">
+          <a href="index.html#collection">Collection 1 — Center of the Universe</a>
+          <a href="index.html#collection">Collection 2 — Coming Soon</a>
+        </div>
+      </div>
+      <a href="about.html" aria-current="page">About Us</a>
+      <a href="index.html#collection">Products</a>
+      <a href="index.html#journal">Blogs</a>
+      <a href="index.html#testimonials">Reviews</a>
+      <a href="#">FAQ</a>
+      <a href="#">Gifts</a>
+    </nav>
+    <div class="nav-icons">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.5 20c1.4-3.6 4.3-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg>
+      <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg>
+      <span class="cart-count"><svg viewBox="0 0 24 24"><path d="M4 6h2l1.6 10.2A2 2 0 0 0 9.6 18h7.8a2 2 0 0 0 2-1.7L20.5 9H7"/><circle cx="10" cy="21" r="1"/><circle cx="17" cy="21" r="1"/></svg><b>0</b></span>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    </div>
+  </div>
+  <nav class="mobile-menu" id="mobileMenu">
+    <a href="index.html">Home</a>
+    <a href="index.html#collection">Collection</a>
+    <a href="about.html" aria-current="page">About Us</a>
+    <a href="index.html#collection">Products</a>
+    <a href="index.html#journal">Blogs</a>
+    <a href="index.html#testimonials">Reviews</a>
+    <a href="#">FAQ</a>
+    <a href="#">Gifts</a>
+  </nav>
+  <div class="logo-row"><a href="index.html" class="wordmark">Everly White</a></div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="hero-media">
+    <svg viewBox="0 0 1200 600" fill="none" aria-hidden="true">
+      <g stroke="#8c4646" stroke-width="0.6" opacity="0.45">
+        <circle cx="980" cy="150" r="52"/><circle cx="1000" cy="140" r="44" fill="#fff9f5" stroke="none" opacity="0.5"/>
+      </g>
+      <g fill="#8c4646" opacity="0.5">
+        <circle cx="120" cy="120" r="2"/><circle cx="220" cy="200" r="1.6"/><circle cx="340" cy="90" r="2.2"/>
+        <circle cx="500" cy="220" r="1.4"/><circle cx="80" cy="320" r="1.8"/><circle cx="640" cy="80" r="1.6"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hero-panel glass">
+    <p class="eyebrow">The House of Everly White</p>
+    <h1 class="display-1">About Us</h1>
+    <p class="lede">A longing — not for more things, but for meaning in the things we live with.</p>
+  </div>
+  <span class="asset-note">Lifestyle photography placeholder</span>
+</section>
+
+<!-- OUR STORY -->
+<section class="story" id="story">
+  <div class="container">
+    <div class="story-grid">
+      <div class="story-visual reveal">
+        <svg viewBox="0 0 200 200" fill="none" aria-label="Line illustration of a crescent moon and stars">
+          <circle cx="100" cy="100" r="46" stroke-width="1"/>
+          <circle cx="118" cy="86" r="40" fill="var(--beige-light)" stroke="none"/>
+          <circle cx="150" cy="55" r="2" fill="var(--brown)" stroke="none"/>
+          <circle cx="45" cy="150" r="1.6" fill="var(--brown)" stroke="none"/>
+          <circle cx="55" cy="40" r="1.4" fill="var(--brown)" stroke="none"/>
+        </svg>
+      </div>
+      <div class="story-copy reveal">
+        <p class="eyebrow">Our Story</p>
+        <h2 class="display-2">Life extends far beyond the material.</h2>
+        <p class="drop">Everly White was born from a longing — not for more things, but for meaning in the things we live with. We believe true richness is found beyond the material, in a deeper awareness of the universe and our place within it.</p>
+        <p>Every piece we create is a quiet invitation: to slow down, to notice, to connect with something larger than ourselves — a philosophy of living guided by universal consciousness rather than consumption.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER INTRODUCTION -->
+<section class="founder" id="founder">
+  <div class="container">
+    <div class="founder-grid">
+      <figure class="founder-portrait reveal">
+        <div class="frame-back"></div>
+        <div class="photo"><span class="initial">E</span></div>
+        <figcaption>Founder portrait — to be replaced with final photography</figcaption>
+      </figure>
+      <div class="founder-copy reveal">
+        <p class="eyebrow">Meet the Founder</p>
+        <h2 class="display-2">A vision carried by hand, not trend.</h2>
+        <p class="founder-name">[ Founder Name ] — Founder &amp; Creative Director</p>
+        <p>Everly White began not in a boardroom, but in the quiet hours — sketching, unlearning, and returning to the ancient idea that beauty should mean something. Our founder set out to build a house where craftsmanship is treated as a form of devotion, and every piece carries the patience of hands that refused to rush.</p>
+        <p>Having spent years studying esoteric traditions and artisanal technique, our founder shaped Everly White as a bridge between the two — a place where cosmic philosophy meets tangible mastery.</p>
+        <div class="founder-quote glass">
+          <p>"I didn't want to build another jewelry brand. I wanted to build a portal — something you wear that reminds you who you actually are."</p>
+        </div>
+        <span class="placeholder-tag">Placeholder copy — swap in the founder's real name, story &amp; photo</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MASTERY IN HUMAN VALUES & CRAFTSMANSHIP -->
+<section class="craft" id="craft">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">Mastery in Human Values &amp; Craftsmanship</p>
+      <h2 class="display-2">True luxury is not just measured by what's around you — but by what's inside you.</h2>
+    </div>
+    <div class="elevate-grid reveal">
+      <div class="elevate-col">
+        <div class="elevate-item">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M20 80 L50 20 L80 80 Z" transform="scale(0.24) translate(20,10)"/><path d="M4 15c3-8 8-11 16-11-1 8-4 13-11 16Z"/></svg>
+          <h4>Bold Minimalism</h4>
+          <p>Clean forms that let the material and the maker's hand speak, favoring restraint over excess.</p>
+        </div>
+        <div class="elevate-item">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+          <h4>Patience Over Speed</h4>
+          <p>Each design is allowed the time it needs — craft rushed is craft compromised.</p>
+        </div>
+      </div>
+      <div class="elevate-media">
+        <svg viewBox="0 0 100 100" fill="none"><path d="M20 80 L50 20 L80 80 Z" stroke-width="1"/><circle cx="50" cy="20" r="2.5" fill="var(--brown)" stroke="none"/></svg>
+      </div>
+      <div class="elevate-col">
+        <div class="elevate-item">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/></svg>
+          <h4>Handmade Imperfection</h4>
+          <p>Every subtle imperfection is proof that a person, not a machine, gave this piece its life.</p>
+        </div>
+        <div class="elevate-item">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l2.5 5 5.5.8-4 4 1 5.5L12 16l-5 2.3 1-5.5-4-4 5.5-.8Z"/></svg>
+          <h4>Unwavering Integrity</h4>
+          <p>Genuine craftsmanship, made with a commitment that never takes a shortcut.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CREATIVE FREEDOM -->
+<section class="freedom">
+  <div class="container">
+    <div class="pattern-block reveal">
+      <svg viewBox="0 0 1200 500" fill="none" aria-hidden="true">
+        <g fill="#8c4646" opacity="0.55">
+          <circle cx="90" cy="80" r="1.6"/><circle cx="220" cy="220" r="1.2"/><circle cx="340" cy="60" r="1.8"/>
+          <circle cx="500" cy="160" r="1.2"/><circle cx="700" cy="90" r="1.6"/><circle cx="880" cy="240" r="1.3"/>
+          <circle cx="1020" cy="70" r="1.7"/><circle cx="1130" cy="200" r="1.3"/>
+        </g>
+      </svg>
+      <div class="about-overlay glass">
+        <p class="eyebrow">Creative Freedom</p>
+        <p class="quote">"Creativity is sacred freedom — not bound by trends, but guided by intuition." Limited, bespoke, and preserved in rarity.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE VALUES -->
+<section class="values" id="values">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="eyebrow">Core Values</p>
+      <h2 class="display-2">What we build our name on.</h2>
+    </div>
+    <div class="values-grid reveal">
+      <div class="value-card">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.4 6.5L21 11l-6.6 2.5L12 20l-2.4-6.5L3 11l6.6-2.5L12 2z"/></svg>
+        <h3>Authenticity</h3>
+        <p>Genuine craftsmanship, made with an unwavering commitment to integrity — never a shortcut, never a substitute.</p>
+      </div>
+      <div class="value-card">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4" fill="var(--brown)" stroke="none"/></svg>
+        <h3>Exclusivity</h3>
+        <p>Created for those who feel it, not those chasing status — rarity as a form of respect for the wearer.</p>
+      </div>
+      <div class="value-card">
+        <svg viewBox="0 0 24 24"><path d="M4 16c3-6 13-6 16 0"/><circle cx="12" cy="8" r="3"/></svg>
+        <h3>Cosmic Luxe Experience</h3>
+        <p>Where esoteric wisdom meets artisanal mastery — luxury that is loud in the eyes, quiet in the essence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSING -->
+<section class="embrace">
+  <div class="container reveal">
+    <p class="eyebrow" style="text-align:center;">Come Home</p>
+    <h2 class="display-2">Step into the universe of bold minimalism.</h2>
+    <p>Where emotions come alive as soon as you step into your home.</p>
+    <div class="embrace-actions">
+      <a class="btn btn-solid" href="index.html#collection">Explore the Collection →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="footer-logo">Everly White</div>
+    <div class="footer-top">
+      <div class="foot-col">
+        <h4>Quick Links</h4>
+        <a href="#">FAQ</a>
+        <a href="#">Contact Us</a>
+        <a href="#">Order Enquiries</a>
+        <a href="index.html#collection">All Products</a>
+      </div>
+      <div class="foot-col">
+        <h4>Policies</h4>
+        <a href="#">Return Policy</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+      <div class="foot-col">
+        <h4>Collections</h4>
+        <a href="index.html#collection">Center of the Universe</a>
+      </div>
+      <div class="foot-col">
+        <h4>About Us</h4>
+        <a href="index.html#journal">Blogs</a>
+        <a href="#story">Our Story</a>
+        <a href="#">Loyalty Program</a>
+      </div>
+    </div>
+    <div class="social-row">
+      <a href="https://www.instagram.com/everlywhitestudios/" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.97.24 2.43.4a4.9 4.9 0 0 1 1.77 1.15c.5.5.85 1.08 1.15 1.77.17.46.36 1.26.4 2.43.07 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.24 1.97-.4 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.46.17-1.26.36-2.43.4-1.25.07-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.97-.24-2.43-.4a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.17-.46-.36-1.26-.4-2.43C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.24-1.97.4-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.6 1.8c.46-.17 1.26-.36 2.43-.4C9.28 1.33 9.68 1.33 12 1.33Zm0 3.24a6.53 6.53 0 1 0 0 13.06 6.53 6.53 0 0 0 0-13.06Zm0 10.78a4.25 4.25 0 1 1 0-8.5 4.25 4.25 0 0 1 0 8.5Zm6.79-11.03a1.53 1.53 0 1 1-3.05 0 1.53 1.53 0 0 1 3.05 0Z"/></svg></a>
+      <a href="https://www.threads.net/@everlywhitestudios" aria-label="Threads"><svg viewBox="0 0 24 24"><path d="M16.5 11.4c-.2-3.5-2.2-5.6-5.6-5.6-2.1 0-3.8.9-4.8 2.5l1.7 1.2c.7-1 1.7-1.5 3-1.5 1.7 0 2.8.9 3.1 2.5-1-.2-2.1-.2-3.1 0-2.8.5-4.5 2-4.5 4.1 0 2.1 1.7 3.6 4.2 3.6 2.1 0 3.6-.9 4.4-2.6.4.4.7.9 1 1.6l1.8-.9c-.3-.8-.8-1.5-1.2-2 .2-.6.3-1.3.3-2 0-.3 0-.6-.3-.9Zm-5.4 4.4c-1.3 0-2.1-.6-2.1-1.5 0-1 .9-1.7 2.5-2 .5-.1 1.2-.1 2 0-.2 2.1-1.2 3.5-2.4 3.5Z"/></svg></a>
+      <a href="https://www.facebook.com/share/1Et5MhcvZV" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13.5 21v-7.9h2.65l.4-3.08H13.5V8.05c0-.89.25-1.5 1.52-1.5h1.63V3.8c-.28-.04-1.25-.12-2.37-.12-2.35 0-3.96 1.43-3.96 4.06v2.27H7.65v3.08h2.67V21h3.18Z"/></svg></a>
+      <a href="https://wa.me/message/OEJJOG6DF762J1" aria-label="WhatsApp"><svg viewBox="0 0 24 24"><path d="M12 2.5A9.5 9.5 0 0 0 3.6 17l-1.1 4 4.1-1.1A9.5 9.5 0 1 0 12 2.5Zm5.5 13.4c-.2.6-1.3 1.2-1.9 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.6-.6-2.9-1.3-4.7-4.2-4.9-4.4-.1-.2-1.2-1.6-1.2-3 0-1.4.7-2.1 1-2.4.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5.2.6.7 1.9.8 2 .1.2.1.4 0 .6-.1.2-.2.3-.4.5-.2.2-.4.4-.5.6-.2.2-.4.4-.2.7.2.3.9 1.5 2 2.4 1.4 1.2 2.5 1.6 2.9 1.8.3.1.5.1.7-.1.2-.2.8-.9 1-1.2.2-.3.4-.2.7-.1.3.1 1.8.8 2.1 1 .3.1.5.2.6.3.1.2.1.9-.1 1.5Z"/></svg></a>
+    </div>
+    <p class="footer-bottom">&copy; 2026 Everly White &middot; All pieces handmade in India</p>
+  </div>
+</footer>
+
+<script>
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+    }, {threshold:.12});
+    document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  } else {
+    document.querySelectorAll('.reveal').forEach(el=>el.classList.add('is-visible'));
+  }
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (hamburgerBtn && mobileMenu) {
+    hamburgerBtn.addEventListener('click', ()=> mobileMenu.classList.toggle('open'));
+  }
+</script>
+
+</body>
+</html>
