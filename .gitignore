@@ -35,6 +35,12 @@ yarn-error.log*
 # ...but keep the template. It holds no values, only the variable names and notes
 # on what each one does, so it is the record of what must be configured on the host.
 !.env.example
+# ...and keep the production origin. It holds a single NEXT_PUBLIC_ value, which is shipped to the
+# browser and therefore public by definition — no secret is exposed by tracking it. It must travel
+# with the source, because NEXT_PUBLIC_ vars are inlined at build time: if the build machine lacks
+# this file it silently falls back to the localhost default and every email link, canonical tag and
+# sitemap entry ships pointing at localhost.
+!.env.production.local
 
 # vercel
 .vercel

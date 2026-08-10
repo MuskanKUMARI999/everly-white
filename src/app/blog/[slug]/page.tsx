@@ -6,8 +6,9 @@ import { CollectionEyebrow as Eyebrow } from "@/components/collection/Eyebrow";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { ShareButtons } from "@/components/blog/ShareButtons";
 import { getAllBlogPosts, getBlogPostBySlug, getBlogSlugs } from "@/lib/data/blog";
+import { siteUrl } from "@/lib/site";
 
-const SITE_URL = "https://everlywhite.com";
+const SITE_URL = siteUrl();
 
 export async function generateStaticParams() {
   return getBlogSlugs().then((slugs) => slugs.map((slug) => ({ slug })));

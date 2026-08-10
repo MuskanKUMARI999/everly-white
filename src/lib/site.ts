@@ -1,9 +1,13 @@
 /**
  * The site's public origin, with no trailing slash.
  *
- * Read from NEXT_PUBLIC_SITE_URL so the sitemap, robots.txt and outgoing email all agree. On
- * Netlify this MUST be https://everlywhite.com — left at the localhost default, a deployed sitemap
- * would advertise localhost URLs to Google.
+ * Read from NEXT_PUBLIC_SITE_URL so the sitemap, robots.txt, canonical/OpenGraph tags and outgoing
+ * email all agree. In production this MUST be https://everlywhite.com (no www — www 301s to it).
+ * Left at the localhost default, a deployed sitemap would advertise localhost URLs to Google and
+ * every email link would be dead.
+ *
+ * NEXT_PUBLIC_ variables are inlined at build time, so this value must be set in the host's
+ * environment BEFORE the build runs. Setting it afterwards changes nothing.
  */
 export function siteUrl() {
   return (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");

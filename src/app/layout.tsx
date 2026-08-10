@@ -8,6 +8,7 @@ import { WishlistProvider } from "@/components/wishlist/WishlistContext";
 import { getCurrentUser } from "@/lib/auth/actions";
 import { getNavCollections } from "@/lib/data/navigation";
 import { qualifiesForWelcomeOffer } from "@/lib/newsletter/welcomeEligibility";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 // Deferred: the welcome popup's JS isn't needed for first paint — it only appears after a delay.
@@ -29,7 +30,11 @@ const ebGaramond = EB_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://everlywhite.com"),
+  // Read from siteUrl() rather than hardcoded, so the canonical origin advertised to Google and
+  // to social scrapers can never disagree with the one in the sitemap, robots.txt and email links.
+  // Hardcoding it meant a deploy could ship a sitemap on one origin and canonical tags on another,
+  // which search engines treat as two sites splitting one ranking.
+  metadataBase: new URL(siteUrl()),
   title: {
     default: "Everly White — Cosmic Luxe Home Decor",
     template: "%s | Everly White",
@@ -40,7 +45,7 @@ export const metadata: Metadata = {
     title: "Everly White — Cosmic Luxe Home Decor",
     description:
       "Handcrafted mirror-work decor plates for a cosmic luxe lifestyle. Bold minimalism, timeless artistry.",
-    url: "https://everlywhite.com",
+    url: siteUrl(),
     siteName: "Everly White",
     locale: "en_IN",
     type: "website",
