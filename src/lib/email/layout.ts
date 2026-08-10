@@ -196,6 +196,51 @@ export function renderEmail({
 </html>`;
 }
 
+/**
+ * Derive a plain-text version of a rendered email.
+ *
+ * Sending HTML with no text alternative is a mild spam signal, and a handful of clients (and
+ * screen-reader setups) prefer the text part outright. Deriving it from the finished HTML rather
+ * than hand-writing eight more templates means the two can never drift apart.
+ *
+ * Links keep their URL in brackets — a text reader with a bare "Track your order" has nowhere to go.
+ */
+export function htmlToPlainText(html: string): string {
+  return (
+    html
+      // The hidden preheader is padded with invisible entities that would become junk in text.
+      // Safe to match greedily-lazily: that div never contains nested elements.
+      .replace(/<div[^>]*display:none[^>]*>[\s\S]*?<\/div>/gi, "")
+      .replace(/<head[\s\S]*?<\/head>/gi, "")
+      .replace(/<(style|script)[\s\S]*?<\/\1>/gi, "")
+      // Keep the destination of real links; drop wrappers with no visible text (the logo).
+      .replace(/<a\b[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_full, href: string, label: string) => {
+        const text = label.replace(/<[^>]+>/g, "").trim();
+        return text ? `${text} (${href})` : "";
+      })
+      .replace(/<br\s*\/?>/gi, "\n")
+      // td included so cells never run together when a template puts a whole row on one line.
+      .replace(/<\/(p|h1|h2|h3|div|td|tr|table)>/gi, "\n")
+      .replace(/<[^>]+>/g, "")
+      // Entities last, so a decoded "<" can never be mistaken for a tag above.
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&middot;/gi, "·")
+      .replace(/&times;/gi, "×")
+      .replace(/&copy;/gi, "©")
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .split("\n")
+      .map((line) => line.replace(/[ \t]+/g, " ").trim())
+      .join("\n")
+      // Collapse the runs of blank lines left by nested tables down to one.
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Body block helpers — so templates never hand-write table markup.    */
 /* ------------------------------------------------------------------ */
