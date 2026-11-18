@@ -1,7 +1,8 @@
 import type { createServiceClient } from "@/lib/supabase/service";
 import type { FormResult } from "@/lib/cart/types";
 
-// Ordering and main-photo selection for a product's gallery.
+// Main-photo selection for a product's gallery. Ordering spans photos *and* videos, so it lives
+// in productMedia.ts alongside the merge rule it depends on.
 //
 // Kept out of actions.ts on purpose: that file carries "use server" and may only export async
 // server actions, so nothing in it can be exercised directly. The rules here are subtle enough to
@@ -72,47 +73,4 @@ export async function promoteFeaturedImage(
     .neq("id", imageId);
 
   return { success: true, message: "Main photo updated." };
-}
-
-/** Shift one image one slot earlier or later in the gallery. */
-export async function reorderProductImage(
-  supabase: Client,
-  productId: string,
-  imageId: string,
-  direction: "up" | "down",
-): Promise<FormResult> {
-  const { data: images, error: loadError } = await supabase
-    .from("product_images")
-    .select("id")
-    .eq("product_id", productId)
-    .order("position", { ascending: true })
-    .order("created_at", { ascending: true });
-
-  if (loadError) return { success: false, message: loadError.message };
-  if (!images?.length) return { success: false, message: "No images to reorder." };
-
-  const index = images.findIndex((img) => img.id === imageId);
-  if (index === -1) return { success: false, message: "That image could not be found." };
-
-  const target = index + (direction === "down" ? 1 : -1);
-  // Already at the end it is being moved toward — nothing to do, and not an error worth showing.
-  if (target < 0 || target >= images.length) return { success: true, message: "" };
-
-  const ordered = [...images];
-  const [moved] = ordered.splice(index, 1);
-  ordered.splice(target, 0, moved);
-
-  // Renumber the whole list rather than swapping two values. Positions can carry gaps (from
-  // deletes) or duplicates (from older rows), and a straight swap preserves both; writing the index
-  // outright leaves a clean 0..n-1 sequence every time.
-  for (const [position, image] of ordered.entries()) {
-    const { error } = await supabase
-      .from("product_images")
-      .update({ position })
-      .eq("id", image.id)
-      .eq("product_id", productId);
-    if (error) return { success: false, message: error.message };
-  }
-
-  return { success: true, message: "Order updated." };
 }

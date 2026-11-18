@@ -31,8 +31,11 @@ export interface CatalogProduct {
   careInstructions?: string;
   makingTime?: string;
   shippingInfo?: string;
-  galleryImages?: { src: string; alt: string }[];
-  videos?: string[];
+  /**
+   * Photos and videos as one admin-ordered sequence — a clip can lead the gallery or sit third.
+   * Was two separate arrays, which forced every video to the end no matter what admin chose.
+   */
+  galleryMedia?: { type: "image" | "video"; src: string; alt: string }[];
   category: string;
   collectionSlug: string;
   /** Units in stock, so the product page's quantity stepper can stop at the real limit. */

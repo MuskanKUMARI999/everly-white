@@ -15,6 +15,7 @@ import { fulfillPaidOrder } from "@/lib/checkout/fulfillment";
 import { primaryProductImage } from "@/lib/data/productImage";
 import { resolveGstState } from "@/lib/invoices/gstStates";
 import { SHIPPING_COUNTRY } from "@/lib/site";
+import { INDIA_PHONE_DIGITS, onlyDigits } from "@/components/ui/countryCodes";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export interface OrderResult extends FormResult {
@@ -63,6 +64,11 @@ async function validateCheckoutForm(formData: FormData): Promise<ValidatedChecko
   }
   if (!/^\d{6}$/.test(pin)) {
     return { error: "Please enter a valid 6-digit PIN code." };
+  }
+  // India-only delivery (SHIPPING_COUNTRY), so the shipping phone is always a 10-digit Indian
+  // mobile. Checked here as well as in the form because this action is a public endpoint.
+  if (onlyDigits(phone).length !== INDIA_PHONE_DIGITS) {
+    return { error: `Please enter a valid ${INDIA_PHONE_DIGITS}-digit phone number.` };
   }
 
   // The checkout form is a fixed dropdown, so a normal customer cannot reach this.

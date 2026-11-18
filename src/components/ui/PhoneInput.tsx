@@ -1,5 +1,10 @@
 import { ChevronDown } from "lucide-react";
-import { COUNTRY_CODES } from "./countryCodes";
+import {
+  COUNTRY_CODES,
+  maxPhoneDigits,
+  onlyDigits,
+  phoneDigitsHint,
+} from "./countryCodes";
 
 interface PhoneInputProps {
   countryIso: string;
@@ -18,13 +23,22 @@ export function PhoneInput({
   inputClassName,
   required = true,
 }: PhoneInputProps) {
+  const maxDigits = maxPhoneDigits(countryIso);
+
+  // Switching country re-applies that country's cap, so picking India (10) after typing an
+  // Indonesian number (up to 12) can't leave two extra digits stranded in the field.
+  function handleCountryChange(iso: string) {
+    onCountryIsoChange(iso);
+    onNumberChange(number.slice(0, maxPhoneDigits(iso)));
+  }
+
   return (
     <div className="flex gap-2">
       <div className="relative shrink-0">
         <select
           aria-label="Country"
           value={countryIso}
-          onChange={(e) => onCountryIsoChange(e.target.value)}
+          onChange={(e) => handleCountryChange(e.target.value)}
           className={`${inputClassName} w-[5.75rem] cursor-pointer appearance-none pr-6`}
         >
           {COUNTRY_CODES.map((c) => (
@@ -43,9 +57,13 @@ export function PhoneInput({
         <input
           required={required}
           type="tel"
+          inputMode="numeric"
           value={number}
-          onChange={(e) => onNumberChange(e.target.value.replace(/[^\d ]/g, ""))}
-          placeholder="Phone Number"
+          // Non-digits are dropped and the value is capped as they type, so an over-long number is
+          // never entered in the first place — nothing to reject on submit.
+          onChange={(e) => onNumberChange(onlyDigits(e.target.value).slice(0, maxDigits))}
+          maxLength={maxDigits}
+          placeholder={`Phone Number (${phoneDigitsHint(countryIso)})`}
           aria-label="Phone Number"
           autoComplete="tel-national"
           className={`${inputClassName} w-full`}

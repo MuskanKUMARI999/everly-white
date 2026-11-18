@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import type { FaqItem } from "./faqData";
+import { RichText } from "@/components/ui/RichText";
+import type { FaqItem } from "@/lib/data/faqs";
 
 export function FaqAccordionItem({
   item,
@@ -37,7 +38,12 @@ export function FaqAccordionItem({
           open ? "grid-rows-[1fr] pb-5 opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
-        <p className="overflow-hidden font-body text-neutral-300">{item.answer}</p>
+        {/* The collapse works by animating the row to 0fr, so whatever sits inside the grid cell
+            has to clip its own overflow. An answer can now be several paragraphs, so that job
+            moved from the single <p> to this wrapper. */}
+        <div className="overflow-hidden">
+          <RichText value={item.answer} className="font-body text-neutral-300" />
+        </div>
       </div>
     </div>
   );

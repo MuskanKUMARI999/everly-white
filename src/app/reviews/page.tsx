@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ReviewsHero } from "@/components/reviews/ReviewsHero";
 import { ReviewsGrid } from "@/components/reviews/ReviewsGrid";
+import { ComeCloserCTA } from "@/components/sections/ComeCloserCTA";
 import { getAllReviews, mapReview } from "@/lib/data/reviews";
 import { getActiveBanners } from "@/lib/data/banners";
 
@@ -16,7 +17,7 @@ export default async function ReviewsPage() {
   return (
     <>
       <ReviewsHero bannerImage={heroBanner?.image_url} bannerAlt={heroBanner?.alt ?? undefined} />
-      <ReviewsGrid reviews={reviews.map(mapReview)} />
+      <ReviewsGrid reviews={reviews.map(mapReview)} cta={<ComeCloserCTA />} />
     </>
   );
 }

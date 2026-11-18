@@ -1,20 +1,27 @@
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
+import { MultilineText } from "@/components/ui/RichText";
 import { ReviewCard } from "@/components/reviews/ReviewCard";
+import { text, type SectionValues } from "@/lib/content/sections";
 import type { Review } from "@/components/reviews/reviewTypes";
 
 interface TestimonialsProps {
   testimonials: Review[];
+  content: SectionValues;
 }
 
-export function Testimonials({ testimonials }: TestimonialsProps) {
+export function Testimonials({ testimonials, content }: TestimonialsProps) {
+  const ctaHref = text(content, "ctaHref");
+
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-content px-6 text-center sm:px-10 lg:px-10">
         <Reveal>
-          <p className="font-heading text-xs uppercase tracking-[0.2em] text-neutral-300">Testimonials</p>
+          <p className="font-heading text-xs uppercase tracking-[0.2em] text-neutral-300">
+            {text(content, "eyebrow")}
+          </p>
           <h2 className="mx-auto mt-3 max-w-xl font-heading text-3xl font-light leading-snug text-neutral-500 sm:text-4xl">
-            Play with lights, colors! Show us your creativity to get featured on our website.
+            <MultilineText value={text(content, "heading")} />
           </h2>
         </Reveal>
 
@@ -26,11 +33,13 @@ export function Testimonials({ testimonials }: TestimonialsProps) {
           ))}
         </div>
 
-        <div className="mt-10 flex justify-center">
-          <Button href="/reviews" variant="tertiary" icon={false}>
-            See All
-          </Button>
-        </div>
+        {ctaHref && (
+          <div className="mt-10 flex justify-center">
+            <Button href={ctaHref} variant="tertiary" icon={false}>
+              {text(content, "ctaLabel")}
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -19,22 +19,24 @@ const inputClasses =
 const labelClasses =
   "font-heading text-[13px] uppercase tracking-widest text-neutral-500";
 const hintClasses = "font-body text-sm text-neutral-400";
-const groupClasses = "flex flex-col gap-4 border-t border-neutral-100 pt-5 sm:col-span-2";
+const groupClasses = "flex flex-col gap-4 border-t border-neutral-100 pt-5";
 const groupTitleClasses =
   "font-heading text-[13px] uppercase tracking-widest text-brown";
+const twoUpClasses = "grid grid-cols-1 gap-4 sm:grid-cols-2";
 
 // Everything this collection shows beyond its own columns lives in `collections.metadata`. These
 // used to be editable only as raw JSON in the Supabase dashboard.
 type CollectionMetadata = {
   eyebrow?: string;
   heroImageAlt?: string;
+  storyEyebrow?: string;
+  shopEyebrow?: string;
   navImage?: string;
   navImageAlt?: string;
   navTagline?: string;
   tileImage?: string;
   intro?: { heading?: string; paragraphs?: string[] };
   stats?: { value?: string; label?: string }[];
-  founderNote?: { heading?: string; quote?: string; attribution?: string };
 };
 
 function readMetadata(collection?: AdminCollection): CollectionMetadata {
@@ -43,25 +45,90 @@ function readMetadata(collection?: AdminCollection): CollectionMetadata {
   return raw as CollectionMetadata;
 }
 
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className={labelClasses}>{label}</label>
+      {children}
+      {hint && <p className={hintClasses}>{hint}</p>}
+    </div>
+  );
+}
+
 /**
- * The metadata-backed fields, shared by the create and edit forms so the two can't drift apart.
- * Every one is optional — leaving it empty removes the key and the storefront falls back to its
- * default (eyebrow → subtitle, nav/tile image → hero image, intro → title + description).
+ * The whole collection page, top to bottom, in the order a visitor reads it: the banner and the
+ * text on it, then The Story, then the product grid.
+ *
+ * This form deliberately holds nothing that renders anywhere else — including the founder's story,
+ * which is not on this page at all and is edited on Admin → About Us.
+ *
+ * The header mega-menu and
+ * homepage tile images are per-collection too, but they belong to other pages, so they sit behind
+ * a closed disclosure at the end rather than in the middle of the page's own copy — mixing them in
+ * was what made this screen hard to read.
+ *
+ * Shared by the create and edit forms so the two cannot drift apart. Every metadata-backed field is
+ * optional: emptying one removes the key and the page falls back to the wording it shipped with.
  */
-function CollectionContentFields({ collection }: { collection?: AdminCollection }) {
+function CollectionPageFields({
+  collection,
+  categories,
+}: {
+  collection?: AdminCollection;
+  categories: AdminCategory[];
+}) {
   const metadata = readMetadata(collection);
-  const introParagraphs = (metadata.intro?.paragraphs ?? []).join("\n\n");
+  // Mirrors the storefront's own fallback. A collection written before the intro moved into
+  // metadata still shows its paragraphs here — without this the box would look empty and saving
+  // would wipe the copy the page was actually displaying.
+  const introParagraphs = metadata.intro?.paragraphs?.length
+    ? metadata.intro.paragraphs.join("\n\n")
+    : (collection?.description ?? "");
   const stats = (metadata.stats ?? [])
     .map((stat) => `${stat.value ?? ""} | ${stat.label ?? ""}`)
     .join("\n");
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <div className={groupClasses}>
-        <p className={groupTitleClasses}>Collection Page</p>
+        <p className={groupTitleClasses}>1 &middot; Hero Banner</p>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Eyebrow</label>
+        <ImageUrlField
+          name="heroImage"
+          label="Banner Image"
+          folder="collections"
+          defaultValue={collection?.hero_image ?? null}
+        />
+        <p className={hintClasses}>
+          The full-width photo at the top of the page. An active &ldquo;Collection Page Hero&rdquo;
+          banner in <strong>Banners</strong> overrides this for every collection, so clear that one
+          if this image is not showing.
+        </p>
+
+        <Field
+          label="Banner Alt Text"
+          hint="Describes the photo for screen readers. With none saved, the title is used."
+        >
+          <input
+            name="heroImageAlt"
+            type="text"
+            defaultValue={metadata.heroImageAlt ?? ""}
+            className={inputClasses}
+          />
+        </Field>
+
+        <Field
+          label="Eyebrow"
+          hint="Small caps line above the title, on the glass card. With none saved, the subtitle is reused."
+        >
           <input
             name="eyebrow"
             type="text"
@@ -69,49 +136,74 @@ function CollectionContentFields({ collection }: { collection?: AdminCollection 
             placeholder="e.g. The Debut Collection"
             className={inputClasses}
           />
-          <p className={hintClasses}>
-            Small caps line above the title. Leave empty to reuse the subtitle.
-          </p>
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Hero Image Alt Text</label>
+        <Field
+          label="Title"
+          hint="The large heading on the banner. Also used in the breadcrumb and above the product grid."
+        >
           <input
-            name="heroImageAlt"
+            name="title"
             type="text"
-            defaultValue={metadata.heroImageAlt ?? ""}
+            // Only a new collection has to be titled here: on an edit an empty box keeps the
+            // title it already has rather than refusing the save.
+            required={!collection}
+            defaultValue={collection?.title ?? ""}
+            placeholder="e.g. The Bloom Edit"
             className={inputClasses}
           />
-          <p className={hintClasses}>
-            Describes the banner photo for screen readers. Leave empty to use the title.
-          </p>
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Intro Heading</label>
+        <Field label="Subtitle" hint="The italic line under the title. Hidden on small phones.">
+          <input
+            name="subtitle"
+            type="text"
+            defaultValue={collection?.subtitle ?? ""}
+            className={inputClasses}
+          />
+        </Field>
+      </div>
+
+      <div className={groupClasses}>
+        <p className={groupTitleClasses}>2 &middot; The Story</p>
+
+        <Field label="Section Eyebrow" hint="Small caps line above the heading.">
+          <input
+            name="storyEyebrow"
+            type="text"
+            defaultValue={metadata.storyEyebrow ?? ""}
+            placeholder="The Story"
+            className={inputClasses}
+          />
+        </Field>
+
+        <Field label="Heading" hint="With none saved, the collection title is used.">
           <input
             name="introHeading"
             type="text"
             defaultValue={metadata.intro?.heading ?? ""}
             className={inputClasses}
           />
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Intro Paragraphs</label>
+        <Field label="Paragraphs" hint="Leave a blank line between paragraphs.">
           <textarea
             name="introParagraphs"
             rows={6}
             defaultValue={introParagraphs}
             className={inputClasses}
           />
-          <p className={hintClasses}>
-            Leave a blank line between paragraphs. Leave empty to use the description above.
-          </p>
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Stats Strip</label>
+        <Field
+          label="Stats Strip"
+          hint={
+            <>
+              The bordered figures under the story. One per line, written as{" "}
+              <code>value | label</code>. With none saved, the strip is hidden.
+            </>
+          }
+        >
           <textarea
             name="stats"
             rows={4}
@@ -119,97 +211,158 @@ function CollectionContentFields({ collection }: { collection?: AdminCollection 
             placeholder={"100+ | Hours of Hand Craft, Per Piece\n500+ | Hand-Set Mirrors"}
             className={inputClasses}
           />
-          <p className={hintClasses}>
-            One per line, written as <code>value | label</code>. Leave empty to hide the strip.
-          </p>
-        </div>
+        </Field>
       </div>
 
       <div className={groupClasses}>
-        <p className={groupTitleClasses}>Founder&apos;s Note</p>
+        <p className={groupTitleClasses}>3 &middot; Shop the Collection</p>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Heading</label>
+        <Field label="Section Eyebrow" hint="Small caps line above the product grid.">
           <input
-            name="founderHeading"
+            name="shopEyebrow"
             type="text"
-            defaultValue={metadata.founderNote?.heading ?? ""}
-            placeholder="Founder's Note"
+            defaultValue={metadata.shopEyebrow ?? ""}
+            placeholder="Shop the Collection"
             className={inputClasses}
           />
-        </div>
+        </Field>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Quote</label>
-          <textarea
-            name="founderQuote"
-            rows={3}
-            defaultValue={metadata.founderNote?.quote ?? ""}
-            className={inputClasses}
-          />
-          <p className={hintClasses}>The note only appears when there is a quote.</p>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Attribution</label>
-          <input
-            name="founderAttribution"
-            type="text"
-            defaultValue={metadata.founderNote?.attribution ?? ""}
-            placeholder="Everly White Studios"
-            className={inputClasses}
-          />
-        </div>
+        <p className={hintClasses}>
+          The heading under it is the collection title above. Which pieces appear is set per product
+          in <strong>Products</strong>, by assigning the product to this collection.
+        </p>
       </div>
 
       <div className={groupClasses}>
-        <p className={groupTitleClasses}>Header Menu &amp; Homepage Tile</p>
+        <p className={groupTitleClasses}>Settings</p>
+        <p className={hintClasses}>Not shown on the page.</p>
 
-        <ImageUrlField
-          name="navImage"
-          label="Header Menu Image"
-          folder="collections"
-          defaultValue={metadata.navImage ?? null}
-        />
-        <p className={hintClasses}>
-          Tall photo in the header&apos;s Collection dropdown. The wide hero banner crops badly
-          there, so it gets its own image. Leave empty to fall back to the hero image.
-        </p>
-
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Header Menu Image Alt Text</label>
-          <input
-            name="navImageAlt"
-            type="text"
-            defaultValue={metadata.navImageAlt ?? ""}
-            className={inputClasses}
-          />
+        <div className={twoUpClasses}>
+          <Field label="Slug" hint="The page address: /collection/your-slug">
+            <input
+              name="slug"
+              type="text"
+              defaultValue={collection?.slug ?? ""}
+              placeholder={collection ? undefined : "auto-generated if empty"}
+              className={inputClasses}
+            />
+          </Field>
+          <Field
+            label="Catalogue Category"
+            hint="Which filter the products page opens on when someone arrives from this collection."
+          >
+            <select
+              name="categoryId"
+              defaultValue={collection?.category_id ?? ""}
+              className={inputClasses}
+            >
+              <option value="">None</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </Field>
         </div>
+      </div>
 
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Header Menu Tagline</label>
-          <input
-            name="navTagline"
-            type="text"
-            defaultValue={metadata.navTagline ?? ""}
-            className={inputClasses}
+      {/* Closed by default: these two images belong to other pages, and having them inline was
+          what made this form read as if the collection page contained them. */}
+      <details className="border border-neutral-100 bg-pink-100/20">
+        <summary className="cursor-pointer p-4 font-heading text-[13px] uppercase tracking-widest text-neutral-400">
+          Not on this page &mdash; header menu &amp; homepage tile
+        </summary>
+
+        <div className="flex flex-col gap-4 border-t border-neutral-100 p-4">
+          <p className={hintClasses}>
+            The banner photo is a wide crop and looks wrong in both of these narrower slots, so each
+            gets its own image. Leave either empty to fall back to the banner photo.
+          </p>
+
+          <ImageUrlField
+            name="navImage"
+            label="Header Menu Image"
+            folder="collections"
+            defaultValue={metadata.navImage ?? null}
           />
           <p className={hintClasses}>
-            One short line in the dropdown. Leave empty for “Discover {"{title}"} Collection”.
+            The tall photo in the site header&apos;s navigation panel.
+          </p>
+
+          <Field label="Header Menu Image Alt Text">
+            <input
+              name="navImageAlt"
+              type="text"
+              defaultValue={metadata.navImageAlt ?? ""}
+              className={inputClasses}
+            />
+          </Field>
+
+          <Field
+            label="Header Menu Tagline"
+            hint={`One short line in the navigation panel. With none saved, "Discover {title} Collection" is shown.`}
+          >
+            <input
+              name="navTagline"
+              type="text"
+              defaultValue={metadata.navTagline ?? ""}
+              className={inputClasses}
+            />
+          </Field>
+
+          <ImageUrlField
+            name="tileImage"
+            label="Homepage Tile Image"
+            folder="collections"
+            defaultValue={metadata.tileImage ?? null}
+          />
+          <p className={hintClasses}>
+            The squarer tile in the homepage &ldquo;Shop By Category&rdquo; grid.
           </p>
         </div>
+      </details>
+    </div>
+  );
+}
 
-        <ImageUrlField
-          name="tileImage"
-          label="Homepage Tile Image"
-          folder="collections"
-          defaultValue={metadata.tileImage ?? null}
+function PublishRow({
+  defaultChecked,
+  pending,
+  label,
+  state,
+}: {
+  defaultChecked: boolean;
+  pending: boolean;
+  label: string;
+  state: { success: boolean; message: string } | null;
+}) {
+  return (
+    <div className="mt-5 flex flex-wrap items-center gap-4 border-t border-neutral-100 pt-5">
+      <label className="flex items-center gap-2 font-body font-medium text-lg text-neutral-500">
+        <input
+          type="checkbox"
+          name="isPublished"
+          defaultChecked={defaultChecked}
+          className="h-4 w-4 accent-brown"
         />
-        <p className={hintClasses}>
-          Used by the homepage “Shop By Category” tile. Leave empty to fall back to the hero image.
+        Published
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="cursor-pointer disabled:cursor-not-allowed bg-brown px-4 py-2 font-heading text-[13px] uppercase tracking-widest text-beige-light transition-colors hover:bg-neutral-500 disabled:bg-neutral-300"
+      >
+        {pending ? "Saving…" : label}
+      </button>
+      {state && (
+        <p
+          className={`font-body font-medium text-lg ${state.success ? "text-green-600" : "text-terracotta"}`}
+        >
+          {state.message}
         </p>
-      </div>
-    </>
+      )}
+    </div>
   );
 }
 
@@ -221,55 +374,15 @@ function CreateCollectionForm({ categories }: { categories: AdminCategory[] }) {
       <h3 className="font-heading text-lg font-light uppercase tracking-widest text-neutral-500">
         Add Collection
       </h3>
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Title</label>
-          <input name="title" type="text" required placeholder="e.g. The Bloom Edit" className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Slug</label>
-          <input name="slug" type="text" placeholder="auto-generated if empty" className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Subtitle</label>
-          <input name="subtitle" type="text" className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Category</label>
-          <select name="categoryId" className={inputClasses}>
-            <option value="">None</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <label className={labelClasses}>Description</label>
-          <textarea name="description" rows={2} className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <ImageUrlField name="heroImage" label="Hero Image" folder="collections" />
-        </div>
-        <CollectionContentFields />
+      <div className="mt-4">
+        <CollectionPageFields categories={categories} />
       </div>
-      <div className="mt-4 flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-2 font-body font-medium text-lg text-neutral-500">
-          <input type="checkbox" name="isPublished" defaultChecked className="h-4 w-4 accent-brown" />
-          Published
-        </label>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="cursor-pointer disabled:cursor-not-allowed bg-brown px-4 py-2 font-heading text-[13px] uppercase tracking-widest text-beige-light transition-colors hover:bg-neutral-500 disabled:bg-neutral-300"
-        >
-          {isPending ? "Creating…" : "Create Collection"}
-        </button>
-        {state && (
-          <p className={`font-body font-medium text-lg ${state.success ? "text-green-600" : "text-terracotta"}`}>
-            {state.message}
-          </p>
-        )}
-      </div>
+      <PublishRow
+        defaultChecked
+        pending={isPending}
+        label={isPending ? "Creating…" : "Create Collection"}
+        state={state}
+      />
     </form>
   );
 }
@@ -286,61 +399,30 @@ function CollectionRow({
 
   return (
     <div className="border border-neutral-100 bg-white p-6 transition-colors hover:border-brown/30">
-      <form action={updateAction} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <h3 className="font-heading text-lg font-light uppercase tracking-widest text-neutral-500">
+        {collection.title}
+        {!collection.is_published && (
+          <span className="ml-3 border border-neutral-200 px-2 py-0.5 font-heading text-xs uppercase tracking-widest text-neutral-400">
+            Unpublished
+          </span>
+        )}
+      </h3>
+
+      <form action={updateAction} className="mt-4">
         <input type="hidden" name="collectionId" value={collection.id} />
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Title</label>
-          <input name="title" type="text" required defaultValue={collection.title} className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Slug</label>
-          <input name="slug" type="text" required defaultValue={collection.slug} className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Subtitle</label>
-          <input name="subtitle" type="text" defaultValue={collection.subtitle ?? ""} className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label className={labelClasses}>Category</label>
-          <select name="categoryId" defaultValue={collection.category_id ?? ""} className={inputClasses}>
-            <option value="">None</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.label}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <label className={labelClasses}>Description</label>
-          <textarea name="description" rows={2} defaultValue={collection.description ?? ""} className={inputClasses} />
-        </div>
-        <div className="flex flex-col gap-1 sm:col-span-2">
-          <ImageUrlField
-            name="heroImage"
-            label="Hero Image"
-            folder="collections"
-            defaultValue={collection.hero_image}
-          />
-        </div>
-        <CollectionContentFields collection={collection} />
-        <div className="flex flex-wrap items-center gap-4 border-t border-neutral-100 pt-5 sm:col-span-2">
-          <label className="flex items-center gap-2 font-body font-medium text-lg text-neutral-500">
-            <input type="checkbox" name="isPublished" defaultChecked={collection.is_published} className="h-4 w-4 accent-brown" />
-            Published
-          </label>
-          <button
-            type="submit"
-            disabled={updatePending}
-            className="cursor-pointer disabled:cursor-not-allowed bg-brown px-4 py-2 font-heading text-[13px] uppercase tracking-widest text-beige-light transition-colors hover:bg-neutral-500 disabled:bg-neutral-300"
-          >
-            {updatePending ? "Saving…" : "Save"}
-          </button>
-          {updateState && (
-            <p className={`font-body font-medium text-lg ${updateState.success ? "text-green-600" : "text-terracotta"}`}>
-              {updateState.message}
-            </p>
-          )}
-        </div>
+        <p className="mb-4 border border-neutral-100 bg-pink-100/20 px-4 py-3 font-body text-base text-neutral-500">
+          Change what you need and save &mdash; anything you leave empty keeps what is already
+          saved for this collection.
+        </p>
+        <CollectionPageFields collection={collection} categories={categories} />
+        <PublishRow
+          defaultChecked={collection.is_published}
+          pending={updatePending}
+          label="Save"
+          state={updateState}
+        />
       </form>
+
       <form
         action={deleteAction}
         className="mt-4 inline-flex items-center gap-3"
@@ -370,6 +452,13 @@ export function AdminCollections({ collections, categories }: AdminCollectionsPr
   return (
     <div className="flex flex-col gap-6">
       <h2 className="font-heading text-2xl font-light text-neutral-500">Collections</h2>
+      <div className="border border-neutral-100 bg-pink-100/30 p-6">
+        <p className="font-body text-base text-neutral-500">
+          Each form below is one collection page, laid out in the order the page reads: the banner
+          and the text on it, then The Story, then the product grid. The founder&apos;s story is not
+          on this page &mdash; it is edited under <strong>About Us</strong>.
+        </p>
+      </div>
       <CreateCollectionForm categories={categories} />
       {collections.length === 0 ? (
         <p className="font-body font-medium text-neutral-500">No collections yet.</p>

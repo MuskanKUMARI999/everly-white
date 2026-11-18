@@ -28,6 +28,13 @@ export function BlogForm({ post }: BlogFormProps) {
     <form action={formAction} className="flex flex-col gap-8">
       {post && <input type="hidden" name="postId" value={post.id} />}
 
+      {post && (
+        <p className="border border-neutral-100 bg-pink-100/20 px-4 py-3 font-body text-base text-neutral-500">
+          Change what you need and save &mdash; anything you leave empty keeps what is already
+          saved for this post.
+        </p>
+      )}
+
       <div className="flex flex-col gap-6 border border-neutral-100 bg-white p-6">
         <h3 className="font-heading text-lg font-light uppercase tracking-widest text-neutral-500">
           Post Details
@@ -35,7 +42,9 @@ export function BlogForm({ post }: BlogFormProps) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1 sm:col-span-2">
             <label className={labelClasses}>Title</label>
-            <input name="title" type="text" required defaultValue={post?.title} className={inputClasses} />
+            {/* Only a new post has to be titled here: on an edit an empty box keeps the title the
+                post already has, so a one-line correction still saves. */}
+            <input name="title" type="text" required={!post} defaultValue={post?.title} className={inputClasses} />
           </div>
           <div className="flex flex-col gap-1 sm:col-span-2">
             <label className={labelClasses}>Slug</label>

@@ -3,8 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getProductById, getAllCategories, getAllCollections } from "@/lib/data/admin";
 import { ProductForm } from "@/components/admin/ProductForm";
-import { ImageUploadPanel } from "@/components/admin/ImageUploadPanel";
-import { VideoUploadPanel } from "@/components/admin/VideoUploadPanel";
+import { ProductMediaPanel } from "@/components/admin/ProductMediaPanel";
 
 interface EditProductPageProps {
   params: Promise<{ id: string }>;
@@ -32,8 +31,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
         </Link>
       </div>
       <h2 className="font-heading text-2xl font-light text-neutral-500">Edit Product</h2>
-      <ImageUploadPanel product={product} />
-      <VideoUploadPanel product={product} />
+      <ProductMediaPanel product={product} />
       <ProductForm product={product} categories={categories} collections={collections} />
     </div>
   );

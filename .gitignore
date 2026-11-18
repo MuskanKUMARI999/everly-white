@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Local Netlify folder
 .netlify
+
+# deploy bundle built for upload to the host — a build artifact, not source
+everly-deploy.zip

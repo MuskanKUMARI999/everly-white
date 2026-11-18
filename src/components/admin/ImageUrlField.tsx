@@ -2,9 +2,10 @@
 
 import { useRef, useState } from "react";
 import Image from "next/image";
-import { Upload, X } from "lucide-react";
+import { Check, Loader2, Upload, X } from "lucide-react";
 import { uploadSingleFile } from "@/lib/admin/uploadClient";
-import { MEDIA_RULES, type SiteImageFolder } from "@/lib/admin/mediaTypes";
+import { CLEARED_SUFFIX } from "@/lib/admin/formValues";
+import { MEDIA_RULES, formatBytes, type SiteImageFolder } from "@/lib/admin/mediaTypes";
 
 interface ImageUrlFieldProps {
   name: string;
@@ -38,9 +39,21 @@ function isUnsupportedImageHost(value: string): boolean {
 export function ImageUrlField({ name, label, defaultValue, folder }: ImageUrlFieldProps) {
   const [url, setUrl] = useState(defaultValue ?? "");
   const [uploading, setUploading] = useState(false);
+  // The file dialog closing was the only sign anything had been chosen. Naming the file — while it
+  // uploads, and after it lands — is what tells you the click did something.
+  const [picked, setPicked] = useState<{ name: string; size: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // An empty field means "leave the saved picture alone" everywhere else in the panel, which would
+  // make the Clear button below do nothing at all. Pressing it therefore posts this alongside the
+  // empty field, and that — not the emptiness — is what removes the image.
+  const [cleared, setCleared] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const unsupportedHost = isUnsupportedImageHost(url);
+
+  function handleUrlChange(next: string) {
+    setUrl(next);
+    if (next.trim()) setCleared(false);
+  }
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -49,14 +62,17 @@ export function ImageUrlField({ name, label, defaultValue, folder }: ImageUrlFie
 
     setUploading(true);
     setError(null);
+    setPicked({ name: file.name, size: file.size });
 
     // Straight to Storage on a server-signed token — the old route handler forwarded the bytes
     // through the server, which put a hero photo at the mercy of the platform's payload ceiling.
     const result = await uploadSingleFile("site-images", folder, file);
     if ("error" in result) {
       setError(result.error);
+      setPicked(null);
     } else {
       setUrl(result.url);
+      setCleared(false);
     }
 
     setUploading(false);
@@ -72,10 +88,11 @@ export function ImageUrlField({ name, label, defaultValue, folder }: ImageUrlFie
           name={name}
           type="url"
           value={url}
-          onChange={(e) => setUrl(e.target.value)}
+          onChange={(e) => handleUrlChange(e.target.value)}
           placeholder="Upload a file, or paste a Supabase Storage URL"
           className={`${inputClasses} min-w-0 flex-1`}
         />
+        {cleared && <input type="hidden" name={`${name}${CLEARED_SUFFIX}`} value="1" />}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
@@ -93,6 +110,24 @@ export function ImageUrlField({ name, label, defaultValue, folder }: ImageUrlFie
           className="hidden"
         />
       </div>
+      {picked && (
+        <p
+          className={`flex items-center gap-2 font-body text-sm ${
+            uploading ? "text-brown" : "text-green-600"
+          }`}
+        >
+          {uploading ? (
+            <Loader2 size={14} strokeWidth={1.8} className="animate-spin" />
+          ) : (
+            <Check size={14} strokeWidth={2} />
+          )}
+          <span className="truncate" title={picked.name}>
+            {picked.name}
+          </span>
+          <span className="shrink-0 text-neutral-400">{formatBytes(picked.size)}</span>
+          <span className="shrink-0">{uploading ? "uploading…" : "uploaded"}</span>
+        </p>
+      )}
       <p className="font-body text-sm text-neutral-400">
         {MEDIA_RULES["site-images"].label}. Uploading is the reliable route — images hosted anywhere
         outside this site&apos;s own storage will not display.
@@ -117,7 +152,11 @@ export function ImageUrlField({ name, label, defaultValue, folder }: ImageUrlFie
           )}
           <button
             type="button"
-            onClick={() => setUrl("")}
+            onClick={() => {
+              setUrl("");
+              setPicked(null);
+              setCleared(true);
+            }}
             className="cursor-pointer absolute right-1 top-1 flex h-6 w-6 items-center justify-center bg-white/80 text-terracotta backdrop-blur-sm transition-colors hover:bg-white"
             title="Clear image"
           >

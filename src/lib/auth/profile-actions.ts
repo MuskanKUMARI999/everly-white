@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { resolveGstState } from "@/lib/invoices/gstStates";
 import { SHIPPING_COUNTRY } from "@/lib/site";
+import {
+  INDIA_PHONE_DIGITS,
+  isValidPhoneDigits,
+  onlyDigits,
+  parseStoredPhone,
+  phoneDigitsHint,
+} from "@/components/ui/countryCodes";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export type FormResult = {
@@ -80,8 +87,14 @@ function validateAddress(formData: FormData): Omit<Tables<"addresses">, "id" | "
     return { success: false, message: "Please enter a valid 6-digit PIN code." };
   }
 
-  if (!/^[\d\s\-+()]{7,20}$/.test(phone)) {
-    return { success: false, message: "Please enter a valid phone number." };
+  // A saved address is copied onto an order and from there onto a GST invoice, and the shop ships
+  // to India only (SHIPPING_COUNTRY). The loose 7-20 character rule this replaces accepted numbers
+  // that could not actually be dialled for a delivery.
+  if (onlyDigits(phone).length !== INDIA_PHONE_DIGITS) {
+    return {
+      success: false,
+      message: `Please enter a valid ${INDIA_PHONE_DIGITS}-digit phone number.`,
+    };
   }
 
   // The form offers a fixed list, but a saved address is copied onto an order at
@@ -292,6 +305,21 @@ export async function updateProfile(
 
   if (!fullName) {
     return { success: false, message: "Full name is required." };
+  }
+
+  // The contact number is optional, but if one is given it has to be a real length for its
+  // country. Falls back to parsing the combined value so the action stands on its own.
+  if (phone) {
+    const parsed = parseStoredPhone(phone);
+    const iso = (formData.get("phoneCountry") as string) || parsed.iso;
+    const national = onlyDigits((formData.get("phoneNational") as string) || parsed.national);
+
+    if (!isValidPhoneDigits(iso, national)) {
+      return {
+        success: false,
+        message: `Please enter a valid phone number (${phoneDigitsHint(iso)}).`,
+      };
+    }
   }
 
   const { error } = await supabase

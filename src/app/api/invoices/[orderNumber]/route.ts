@@ -37,6 +37,7 @@ type OrderLookup = {
   id: string;
   user_id: string | null;
   guest_email: string | null;
+  former_account_email: string | null;
   order_number: string;
   payment_status: string;
 };
@@ -45,7 +46,7 @@ async function findOrder(orderNumber: string): Promise<OrderLookup | null> {
   const service = createServiceClient();
   const { data } = await service
     .from("orders")
-    .select("id, user_id, guest_email, order_number, payment_status")
+    .select("id, user_id, guest_email, former_account_email, order_number, payment_status")
     .eq("order_number", orderNumber.toUpperCase())
     .maybeSingle();
   return data;

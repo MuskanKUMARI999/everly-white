@@ -5,6 +5,7 @@ import { CheckCircle2, MapPin, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CollectionEyebrow as Eyebrow } from "@/components/collection/Eyebrow";
 import { inputClasses } from "@/components/ui/inputStyles";
+import { INDIA_PHONE_DIGITS, onlyDigits } from "@/components/ui/countryCodes";
 import { StateSelect } from "@/components/ui/StateSelect";
 import { SHIPPING_COUNTRY } from "@/lib/site";
 import { AccountEmptyState } from "./AccountEmptyState";
@@ -54,11 +55,21 @@ function AddressForm({
           required
           className={inputClasses}
         />
+        {/* Digits only, capped at 10 — this address ships within India (SHIPPING_COUNTRY), so
+            there is no country selector and no other length to allow. Uncontrolled like its
+            siblings; the cap is applied by rewriting the field's own value as they type. A row
+            saved under the old loose rule is trimmed to its last 10 digits so an edit starts from
+            something the new rule accepts. */}
         <input
           name="phone"
           type="tel"
-          defaultValue={address?.phone ?? ""}
-          placeholder="Phone Number"
+          inputMode="numeric"
+          defaultValue={onlyDigits(address?.phone ?? "").slice(-INDIA_PHONE_DIGITS)}
+          onChange={(e) => {
+            e.target.value = onlyDigits(e.target.value).slice(0, INDIA_PHONE_DIGITS);
+          }}
+          maxLength={INDIA_PHONE_DIGITS}
+          placeholder={`Phone Number (${INDIA_PHONE_DIGITS} digits)`}
           aria-label="Phone Number"
           required
           className={inputClasses}

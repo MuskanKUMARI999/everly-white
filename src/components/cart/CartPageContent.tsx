@@ -101,8 +101,11 @@ export function CartPageContent() {
                       </button>
                     </div>
 
-                    <div className="flex items-end justify-between">
-                      <div className="flex items-center border border-neutral-100">
+                    {/* flex-wrap because at 320px the stepper (104px) leaves only ~52px beside it,
+                        which is narrower than the price. Without wrapping the price shrinks and breaks
+                        at its space into "₹" / "8,800.00" across two lines. */}
+                    <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
+                      <div className="flex shrink-0 items-center border border-neutral-100">
                         <button
                           type="button"
                           aria-label={`Decrease quantity of ${item.name}`}
@@ -129,7 +132,9 @@ export function CartPageContent() {
                           <Plus size={13} strokeWidth={1.5} />
                         </button>
                       </div>
-                      <div className="text-right">
+                      {/* ml-auto keeps the price hard right on the line of its own it takes when the
+                          row wraps, where justify-between would otherwise park it at the start. */}
+                      <div className="ml-auto shrink-0 text-right">
                         <p className="font-body text-neutral-500">
                           {formatPrice(item.price * item.quantity)}
                         </p>

@@ -264,7 +264,7 @@ export async function issueInvoiceForOrder(orderId: string): Promise<IssueResult
     pinCode: address.pin_code ?? null,
     country: address.country ?? "India",
     phone: address.phone ?? null,
-    email: order.guest_email ?? address.email ?? null,
+    email: order.guest_email ?? order.former_account_email ?? address.email ?? null,
     orderNumber: order.order_number,
     orderDate: order.created_at ?? new Date().toISOString(),
     paymentMethod: describePaymentMethod(order.payment_details),

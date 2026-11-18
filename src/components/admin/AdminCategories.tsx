@@ -75,11 +75,11 @@ function CategoryRow({ category }: { category: AdminCategory }) {
           <label className="font-heading text-[13px] uppercase tracking-widest text-neutral-500">
             Label
           </label>
+          {/* Neither box is required on an existing category: empty keeps what is stored. */}
           <input
             name="label"
             type="text"
             defaultValue={category.label}
-            required
             className="border border-neutral-200 bg-white px-3 py-2 font-body font-medium text-lg text-neutral-500 outline-none transition-colors focus:border-neutral-500"
           />
         </div>
@@ -91,7 +91,6 @@ function CategoryRow({ category }: { category: AdminCategory }) {
             name="key"
             type="text"
             defaultValue={category.key}
-            required
             className="border border-neutral-200 bg-white px-3 py-2 font-body font-medium text-lg text-neutral-500 outline-none transition-colors focus:border-neutral-500"
           />
         </div>

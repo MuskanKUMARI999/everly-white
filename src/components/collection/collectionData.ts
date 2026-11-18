@@ -33,16 +33,15 @@ export interface CollectionInfo {
   subtitle: string;
   heroImage: string;
   heroImageAlt: string;
+  /** Small-caps line above the intro heading. Was hardcoded "The Story". */
+  storyEyebrow: string;
   intro: {
     heading: string;
     paragraphs: string[];
   };
   stats: { value: string; label: string }[];
-  founderNote: {
-    heading: string;
-    quote: string;
-    attribution: string;
-  };
+  /** Small-caps line above the product grid. Was hardcoded "Shop the Collection". */
+  shopEyebrow: string;
   products: CollectionProduct[];
 }
 
@@ -54,6 +53,8 @@ export const centerOfTheUniverse: CollectionInfo = {
   subtitle: "Luxe designs that are loud in the eyes, quiet in the essence.",
   heroImage: "/images/instagram/insta-chair.jpg",
   heroImageAlt: "Everly White mirror-inlay plates styled in a sunlit living room",
+  storyEyebrow: "The Story",
+  shopEyebrow: "Shop the Collection",
   intro: {
     heading: "Where two souls become one reflection.",
     paragraphs: [
@@ -65,12 +66,6 @@ export const centerOfTheUniverse: CollectionInfo = {
     { value: "5", label: "Pieces in the Collection" },
     { value: "100+", label: "Hours of Hand Craft, Per Piece" },
   ],
-  founderNote: {
-    heading: "A reminder that what is meant for you has no clock.",
-    quote:
-      "It waits. It finds you. Not even time can take it away. The Center of the Universe collection celebrates our never-ending desire and longing for a person to come home to — someone our soul calls home.",
-    attribution: "Everly White Studios, Founder's Note",
-  },
   products: [
     {
       name: "Twin Flames",

@@ -12,10 +12,16 @@ import { signIn } from "@/lib/auth/actions";
 const compactInputClasses =
   "w-full border border-neutral-200 bg-transparent px-4 py-[clamp(0.375rem,1vh,0.625rem)] font-body text-neutral-500 outline-none transition-colors focus:border-neutral-500 placeholder:text-neutral-200";
 
-export function LoginForm({ next }: { next?: string }) {
+export function LoginForm({ next, notice }: { next?: string; notice?: string }) {
   const [state, action, isPending] = useActionState(signIn, null);
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
+
+  // Controlled for the same reason as the signup form: React resets an uncontrolled form once a
+  // form action settles, so a wrong password used to wipe the email address too and make the
+  // customer retype it. Holding both in state leaves the form as they left it, plus the message.
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   if (state?.success) {
     return (
@@ -31,6 +37,15 @@ export function LoginForm({ next }: { next?: string }) {
 
   return (
     <>
+      {notice && (
+        <p
+          role="status"
+          className="mb-[clamp(0.375rem,1.2vh,0.75rem)] border border-neutral-100 bg-pink-100/40 px-4 py-3 font-body text-[clamp(0.6875rem,1.4vh,0.8125rem)] text-neutral-400"
+        >
+          {notice}
+        </p>
+      )}
+
       <form action={action} noValidate className="flex flex-col gap-[clamp(0.375rem,1.2vh,0.75rem)]">
         {/* Re-validated server-side in signIn — a hidden field is as forgeable as the query param. */}
         {next && <input type="hidden" name="next" value={next} />}
@@ -39,6 +54,8 @@ export function LoginForm({ next }: { next?: string }) {
             required
             type="email"
             name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Email Address"
             aria-label="Email Address"
             autoComplete="email"
@@ -51,6 +68,8 @@ export function LoginForm({ next }: { next?: string }) {
             required
             type={showPassword ? "text" : "password"}
             name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             aria-label="Password"
             autoComplete="current-password"
@@ -70,7 +89,9 @@ export function LoginForm({ next }: { next?: string }) {
         </div>
 
         {state?.success === false && (
-          <p className="font-body text-sm text-terracotta">{state.message}</p>
+          <p role="alert" aria-live="polite" className="font-body text-sm text-terracotta">
+            {state.message}
+          </p>
         )}
 
         <div className="flex items-center justify-between">

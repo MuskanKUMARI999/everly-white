@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import type { ReactNode } from "react";
 import { Reveal } from "@/components/ui/Reveal";
 import { Button } from "@/components/ui/Button";
-import { ComeCloserCTA } from "@/components/sections/ComeCloserCTA";
 import { ReviewCard } from "./ReviewCard";
 import { StarRating } from "./StarRating";
 import type { Review } from "./reviewTypes";
@@ -18,9 +18,12 @@ const PAGE_SIZE = 9;
 
 interface ReviewsGridProps {
   reviews: Review[];
+  /** The closing CTA band, passed in as an element: it is a server component that reads its own
+   *  copy, and importing it here would drag it into the client bundle. */
+  cta?: ReactNode;
 }
 
-export function ReviewsGrid({ reviews }: ReviewsGridProps) {
+export function ReviewsGrid({ reviews, cta }: ReviewsGridProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const visibleReviews = reviews.slice(0, visibleCount);
 
@@ -92,7 +95,7 @@ export function ReviewsGrid({ reviews }: ReviewsGridProps) {
         </div>
       </section>
 
-      <ComeCloserCTA />
+      {cta}
     </main>
   );
 }

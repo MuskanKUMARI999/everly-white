@@ -16,6 +16,9 @@ import {
   Users,
   Ticket,
   Image as ImageIcon,
+  House,
+  Info,
+  HelpCircle,
   Bell,
   Menu,
   X,
@@ -30,6 +33,9 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/admin/home", label: "Home Page", icon: House },
+  { href: "/admin/about", label: "About Us", icon: Info },
+  { href: "/admin/faqs", label: "FAQs", icon: HelpCircle },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { href: "/admin/products", label: "Products", icon: Package },
   { href: "/admin/categories", label: "Categories", icon: Tags },

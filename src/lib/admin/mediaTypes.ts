@@ -7,7 +7,7 @@
 
 export type MediaBucket = "product-images" | "product-videos" | "site-images";
 
-export type SiteImageFolder = "collections" | "blog" | "banners";
+export type SiteImageFolder = "collections" | "blog" | "banners" | "content";
 
 export const MEDIA_RULES: Record<MediaBucket, { types: string[]; maxBytes: number; label: string }> =
   {
@@ -57,4 +57,20 @@ export function checkFileAgainstRules(bucket: MediaBucket, file: File): string |
     return `"${file.name}" is ${formatBytes(file.size)} — the limit is ${formatBytes(rules.maxBytes)}.`;
   }
   return null;
+}
+
+/**
+ * An uploaded product file plus which bucket it landed in. Photos and videos share one gallery
+ * order, so a batch has to be registered as a single ordered list rather than one call per table —
+ * otherwise the second call's rows would be stacked on top of the first call's.
+ */
+export type ProductMediaUpload = UploadedMedia & { kind: "image" | "video" };
+
+/** Which of the two product buckets a picked file belongs in. */
+export function productMediaKind(file: File): "image" | "video" {
+  return file.type.startsWith("video/") ? "video" : "image";
+}
+
+export function productMediaBucket(file: File): MediaBucket {
+  return productMediaKind(file) === "video" ? "product-videos" : "product-images";
 }

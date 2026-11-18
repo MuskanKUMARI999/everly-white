@@ -51,3 +51,11 @@ export function shouldSuppressWelcomePopup(pathname: string) {
     isMinimalChromeRoute(pathname) || pathname === "/reset-password" || isAdminRoute(pathname)
   );
 }
+
+/**
+ * A single product's page, /products/<slug> — not the /products listing above it. The header
+ * auto-hides here so the gallery images aren't permanently overlapped by a pinned bar.
+ */
+export function isProductDetailRoute(pathname: string) {
+  return /^\/products\/[^/]+$/.test(pathname);
+}

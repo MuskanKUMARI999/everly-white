@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 import { getAllCollections } from "@/lib/data/collections";
+import { list, text, type SectionValues } from "@/lib/content/sections";
 
 interface CategoryTile {
   name: string;
@@ -10,22 +11,13 @@ interface CategoryTile {
   badge?: string;
 }
 
-const FALLBACK_IMAGE = "/images/banners/category-1.jpeg";
-
-// Upcoming collections aren't published in the database yet, so they can't come from
-// getAllCollections. Kept here as a teaser tile so the grid stays balanced and the "coming soon"
-// preview is preserved (mirrors the header mega-menu's treatment).
-const UPCOMING_TILES: CategoryTile[] = [
-  {
-    name: "Celestial Bloom",
-    image: "/images/banners/category-2.png",
-    href: "/products?collection=celestial-bloom",
-    badge: "Coming Soon",
-  },
-];
-
-export async function ShopByCategory() {
+export async function ShopByCategory({ content }: { content: SectionValues }) {
   const collections = await getAllCollections();
+  const fallbackImage = text(content, "fallbackImage");
+
+  // Published collections lead; the extra tiles from Admin → Home Page follow. Those exist for
+  // collections that aren't in the database yet (the "coming soon" teasers), which is why they
+  // can't come from getAllCollections and are kept as editable rows instead.
   const tiles: CategoryTile[] = [
     ...collections.map((collection) => {
       // The tile wants a squarer crop than the collection page hero, so it gets its own
@@ -35,19 +27,29 @@ export async function ShopByCategory() {
 
       return {
         name: collection.title,
-        image: tileImage ?? collection.hero_image ?? FALLBACK_IMAGE,
+        image: tileImage ?? collection.hero_image ?? fallbackImage,
         href: `/collection/${collection.slug}`,
       };
     }),
-    ...UPCOMING_TILES,
-  ];
+    ...list(content, "upcoming")
+      // A half-filled row typed into admin would otherwise render as a broken image tile.
+      .filter((tile) => tile.image && tile.href)
+      .map((tile) => ({
+        name: tile.name,
+        image: tile.image,
+        href: tile.href,
+        badge: tile.badge || undefined,
+      })),
+  ].filter((tile) => tile.image);
+
+  if (tiles.length === 0) return null;
 
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-content px-6 sm:px-10 lg:px-10">
         <Reveal>
           <h2 className="text-center font-heading text-xs uppercase tracking-[0.2em] text-neutral-500">
-            Shop By Category
+            {text(content, "heading")}
           </h2>
         </Reveal>
 

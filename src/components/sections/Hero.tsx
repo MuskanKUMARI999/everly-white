@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { MultilineText } from "@/components/ui/RichText";
+import { list, text, type SectionValues } from "@/lib/content/sections";
 
 export interface HeroSlide {
   src: string;
@@ -14,19 +16,6 @@ export interface HeroSlide {
   href: string | null;
 }
 
-const FALLBACK_SLIDES: HeroSlide[] = [
-  {
-    src: "/images/banners/hero-1.png",
-    alt: "Two ivory mirror-inlay Everly White plates on gold stands, styled on a marble console in a blush-pink living room",
-    href: null,
-  },
-  {
-    src: "/images/banners/hero-2.png",
-    alt: "An Everly White gift set — two gold-and-ivory mandala plates on stands beside the branded gift box, drawstring pouch, bag and card",
-    href: null,
-  },
-];
-
 // Fallback name for a *linked* banner whose Alt Text was left blank in admin. An image alt can't be
 // invented (we don't know what the client uploaded), but a link with no accessible name is a real
 // failure for screen readers — so the link gets a name describing where it goes, not what it shows.
@@ -34,11 +23,18 @@ const UNLABELLED_BANNER_LINK = "View featured collection";
 
 interface HeroProps {
   averageRating: string;
+  /** The "Homepage Hero Slider" banners. Empty falls back to the slides in Admin → Home Page. */
   slides?: HeroSlide[];
+  content: SectionValues;
 }
 
-export function Hero({ averageRating, slides }: HeroProps) {
-  const activeSlides = slides && slides.length > 0 ? slides : FALLBACK_SLIDES;
+export function Hero({ averageRating, slides, content }: HeroProps) {
+  const fallbackSlides: HeroSlide[] = list(content, "fallbackSlides")
+    .filter((slide) => slide.src)
+    .map((slide) => ({ src: slide.src, alt: slide.alt, href: slide.href || null }));
+  const activeSlides = slides && slides.length > 0 ? slides : fallbackSlides;
+  const ctaHref = text(content, "ctaHref");
+  const reviewsHref = text(content, "reviewsHref");
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -93,20 +89,18 @@ export function Hero({ averageRating, slides }: HeroProps) {
           className="w-fit max-w-[90vw] border border-white/20 bg-white/5 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.2)] backdrop-blur-sm sm:p-10"
         >
           <h1 className="font-heading text-3xl font-light leading-tight text-neutral-500 sm:text-5xl sm:leading-[1.1]">
-            Come Home
-            <br />
-            to your
-            <br />
-            Soulmate
+            <MultilineText value={text(content, "heading")} />
           </h1>
           <p className="mt-4 font-body text-lg italic text-neutral-500">
-            Because God created us in pairs...
+            {text(content, "tagline")}
           </p>
-          <div className="mt-6">
-            <Button href="/products" variant="primary">
-              Discover More
-            </Button>
-          </div>
+          {ctaHref && (
+            <div className="mt-6">
+              <Button href={ctaHref} variant="primary">
+                {text(content, "ctaLabel")}
+              </Button>
+            </div>
+          )}
         </motion.div>
       </div>
 
@@ -130,29 +124,31 @@ export function Hero({ averageRating, slides }: HeroProps) {
           style beats a class — so a `-translate-y-1/2` class here was being silently discarded the
           moment the slide-in animation set translateX, leaving the tab hanging half its own height
           below centre. Any transform on a motion element belongs in initial/animate. */}
-      <motion.div
-        initial={{ opacity: 0, x: -16, y: "-50%" }}
-        animate={{ opacity: 1, x: 0, y: "-50%" }}
-        transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed left-0 top-1/2 z-30"
-      >
-        <Link
-          href="/reviews"
-          className="group flex flex-col items-center gap-2.5 border border-white/40 bg-pink-200/95 px-3 py-6 shadow-[0_6px_24px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-300 hover:bg-brown hover:px-4"
+      {reviewsHref && (
+        <motion.div
+          initial={{ opacity: 0, x: -16, y: "-50%" }}
+          animate={{ opacity: 1, x: 0, y: "-50%" }}
+          transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="fixed left-0 top-1/2 z-30"
         >
-          <Star
-            size={14}
-            strokeWidth={1.5}
-            className="fill-brown text-brown transition-colors duration-300 group-hover:fill-beige-light group-hover:text-beige-light"
-          />
-          <span className="rotate-180 font-heading text-xs uppercase tracking-[0.2em] text-neutral-500 transition-colors duration-300 [writing-mode:vertical-rl] group-hover:text-beige-light">
-            Reviews
-          </span>
-          <span className="rotate-180 font-body text-[13px] font-semibold tracking-widest text-neutral-400 transition-colors duration-300 [writing-mode:vertical-rl] group-hover:text-beige-light/90">
-            {averageRating}/5
-          </span>
-        </Link>
-      </motion.div>
+          <Link
+            href={reviewsHref}
+            className="group flex flex-col items-center gap-2.5 border border-white/40 bg-pink-200/95 px-3 py-6 shadow-[0_6px_24px_rgba(0,0,0,0.15)] backdrop-blur-sm transition-all duration-300 hover:bg-brown hover:px-4"
+          >
+            <Star
+              size={14}
+              strokeWidth={1.5}
+              className="fill-brown text-brown transition-colors duration-300 group-hover:fill-beige-light group-hover:text-beige-light"
+            />
+            <span className="rotate-180 font-heading text-xs uppercase tracking-[0.2em] text-neutral-500 transition-colors duration-300 [writing-mode:vertical-rl] group-hover:text-beige-light">
+              {text(content, "reviewsLabel")}
+            </span>
+            <span className="rotate-180 font-body text-[13px] font-semibold tracking-widest text-neutral-400 transition-colors duration-300 [writing-mode:vertical-rl] group-hover:text-beige-light/90">
+              {averageRating}/5
+            </span>
+          </Link>
+        </motion.div>
+      )}
     </section>
   );
 }

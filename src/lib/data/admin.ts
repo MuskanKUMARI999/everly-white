@@ -3,6 +3,12 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import { istDayKey } from "@/lib/format/datetime";
+import {
+  normaliseValues,
+  sectionsForPage,
+  type SectionSchema,
+  type SectionValues,
+} from "@/lib/content/sections";
 import type { Tables } from "@/lib/supabase/database.types";
 
 export type AdminCategory = Tables<"categories">;
@@ -123,7 +129,8 @@ export async function getAllOrders(): Promise<AdminOrder[]> {
   return orders.map((order) => ({
     ...order,
     customer_email:
-      order.guest_email ?? (order.user_id ? (emails.get(order.user_id) ?? null) : null),
+      order.guest_email ??
+      (order.user_id ? (emails.get(order.user_id) ?? null) : order.former_account_email),
   }));
 }
 
@@ -590,3 +597,79 @@ async function dashboardStatsFallback(
   };
 }
 
+
+// ─── Page content ─────────────────────────────────────────────────────────────
+
+export type AdminSection = {
+  values: SectionValues;
+  isVisible: boolean;
+  /** True once the section has been saved at all — otherwise it is still showing its shipped copy. */
+  isCustomised: boolean;
+};
+
+/**
+ * Every editable section for one page, ready to hand to the admin form.
+ *
+ * Unlike the storefront reader this always returns a row per section in the schema, customised or
+ * not: the form has to render an input for a field nobody has touched yet, pre-filled with the
+ * copy the site is actually showing.
+ */
+export async function getAdminSections(
+  page: SectionSchema["page"],
+): Promise<Record<string, AdminSection>> {
+  const schemas = sectionsForPage(page);
+  if (!(await requireAdmin())) return {};
+
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("site_content")
+    .select("key, content, is_visible")
+    .in(
+      "key",
+      schemas.map((schema) => schema.key),
+    );
+
+  if (error) console.error("Error fetching site content:", error);
+
+  const rows = new Map((data ?? []).map((row) => [row.key, row]));
+
+  return Object.fromEntries(
+    schemas.map((schema) => {
+      const row = rows.get(schema.key);
+      return [
+        schema.key,
+        {
+          values: normaliseValues(schema, row?.content ?? {}),
+          isVisible: row?.is_visible ?? true,
+          isCustomised: row !== undefined,
+        },
+      ];
+    }),
+  );
+}
+
+// ─── FAQs ─────────────────────────────────────────────────────────────────────
+
+export type AdminFaqItem = Tables<"faq_items">;
+export type AdminFaqCategory = Tables<"faq_categories"> & { items: AdminFaqItem[] };
+
+/** Every category and question, including the ones toggled off — the storefront reader hides those. */
+export async function getAdminFaqCategories(): Promise<AdminFaqCategory[]> {
+  if (!(await requireAdmin())) return [];
+
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("faq_categories")
+    .select("*, faq_items(*)")
+    .order("position", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching FAQs:", error);
+    return [];
+  }
+
+  return (data ?? []).map((category) => ({
+    ...category,
+    items: (category.faq_items ?? []).slice().sort((a, b) => a.position - b.position),
+  }));
+}

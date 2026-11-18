@@ -134,6 +134,11 @@ function OrderRow({ order }: { order: AdminOrder }) {
                 Account
               </span>
             )}
+            {!order.user_id && order.former_account_email && (
+              <span className="ml-2 rounded-sm bg-neutral-100 px-2 py-0.5 font-heading text-[12px] uppercase tracking-widest text-neutral-400">
+                Deleted account
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-4">

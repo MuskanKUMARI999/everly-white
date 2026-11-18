@@ -1,33 +1,21 @@
 import Image from "next/image";
 import { Play } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
+import { list, text, type SectionValues } from "@/lib/content/sections";
 
-const clips: { image: string; caption: string; objectPosition?: string }[] = [
-  {
-    image: "/images/products/twin-flames/1-pair.jpg",
-    caption: "100 Hours of Handcraft",
-  },
-  {
-    image: "/images/instagram/product-coffee-table.jpg",
-    caption: "Styled: Center of the Universe",
-  },
-  {
-    image: "/images/brand/packaging-flatlay.jpg",
-    caption: "Unboxing: Twin Flames",
-    objectPosition: "80% 60%",
-  },
-];
+export function VideoShowcase({ content }: { content: SectionValues }) {
+  const clips = list(content, "clips").filter((clip) => clip.image);
+  if (clips.length === 0) return null;
 
-export function VideoShowcase() {
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-content px-6 text-center sm:px-10 lg:px-10">
         <Reveal>
           <p className="font-heading text-xs uppercase tracking-[0.2em] text-neutral-300">
-            In Motion
+            {text(content, "eyebrow")}
           </p>
           <h2 className="mt-3 font-heading text-3xl text-neutral-500 sm:text-4xl">
-            See the Craft Come to Life
+            {text(content, "heading")}
           </h2>
         </Reveal>
       </div>
@@ -35,7 +23,7 @@ export function VideoShowcase() {
       <div className="mx-auto mt-12 max-w-content px-6 sm:px-10 lg:px-10">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {clips.map((clip, i) => (
-            <Reveal key={clip.caption} delay={i * 0.1}>
+            <Reveal key={`${i}-${clip.image}`} delay={i * 0.1}>
             <button
               type="button"
               className="cursor-pointer group relative block aspect-3/4 w-full overflow-hidden text-left"

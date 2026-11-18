@@ -4,6 +4,12 @@ import { useActionState, useMemo, useRef, useState } from "react";
 import { Upload } from "lucide-react";
 import { createProduct, updateProduct } from "@/lib/admin/actions";
 import { uploadFiles, newBatchFolder } from "@/lib/admin/uploadClient";
+import {
+  SelectedMediaList,
+  mergeFiles,
+  withItemState,
+  type MediaItem,
+} from "@/components/admin/SelectedMedia";
 import { MEDIA_RULES, type MediaBucket, type UploadedMedia } from "@/lib/admin/mediaTypes";
 import type { AdminProduct } from "@/lib/data/admin";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -39,24 +45,43 @@ function NewProductMediaPicker({
   const inputRef = useRef<HTMLInputElement>(null);
   const batchFolder = useMemo(() => newBatchFolder(), []);
   const [uploaded, setUploaded] = useState<UploadedMedia[]>([]);
+  // One tile per file picked so far, so the picker shows names and thumbnails instead of only a
+  // running count. Files here go straight to Storage, so they are never in a "pending" state.
+  const [items, setItems] = useState<MediaItem[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  const [dragging, setDragging] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
-  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
-    event.target.value = "";
+  async function handleFiles(files: File[]) {
     if (!files.length) return;
 
     setErrors([]);
     setProgress({ done: 0, total: files.length });
+    setItems((current) => mergeFiles(current, files));
 
-    const result = await uploadFiles(bucket, batchFolder, files, (done, total) =>
-      setProgress({ done, total }),
-    );
+    const result = await uploadFiles(bucket, batchFolder, files, (event) => {
+      setProgress({ done: event.done, total: event.total });
+      setItems((current) =>
+        withItemState(
+          current,
+          event.file,
+          event.phase === "start" ? "uploading" : event.phase === "done" ? "done" : "error",
+          event.message,
+        ),
+      );
+    });
 
     setProgress(null);
     setUploaded((current) => [...current, ...result.uploaded]);
     setErrors(result.errors);
+  }
+
+  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    // Read before clearing: the input is emptied so the same file can be picked again, and its
+    // FileList is gone by the time the upload starts.
+    const files = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    await handleFiles(files);
   }
 
   const busy = progress !== null;
@@ -74,10 +99,32 @@ function NewProductMediaPicker({
       <input type="hidden" name={fieldName} value={JSON.stringify(uploaded)} />
 
       <div
-        className={`flex flex-col items-center justify-center gap-2 border border-dashed border-neutral-200 bg-neutral-50 py-8 transition-colors ${
-          busy ? "cursor-wait opacity-60" : "cursor-pointer hover:border-brown/40 hover:bg-pink-100/20"
+        role="button"
+        tabIndex={0}
+        className={`flex flex-col items-center justify-center gap-2 border border-dashed py-8 transition-colors ${
+          busy
+            ? "cursor-wait border-neutral-200 bg-neutral-50 opacity-60"
+            : dragging
+              ? "cursor-pointer border-brown bg-pink-100/30"
+              : "cursor-pointer border-neutral-200 bg-neutral-50 hover:border-brown/40 hover:bg-pink-100/20"
         }`}
         onClick={() => !busy && inputRef.current?.click()}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            if (!busy) inputRef.current?.click();
+          }
+        }}
+        onDragOver={(event) => {
+          event.preventDefault();
+          if (!busy) setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={(event) => {
+          event.preventDefault();
+          setDragging(false);
+          if (!busy) void handleFiles(Array.from(event.dataTransfer.files));
+        }}
       >
         <Upload size={20} strokeWidth={1.2} className="text-neutral-300" />
         <p className="font-body text-base text-neutral-500">
@@ -85,7 +132,7 @@ function NewProductMediaPicker({
             ? `Uploading ${progress.done}/${progress.total}…`
             : uploaded.length > 0
               ? `${uploaded.length} ${noun} ready — click to add more`
-              : `Click to select ${noun}`}{" "}
+              : `Click to select ${noun}, or drop them here`}{" "}
           <span className="text-neutral-300">({MEDIA_RULES[bucket].label})</span>
         </p>
         <input
@@ -97,6 +144,10 @@ function NewProductMediaPicker({
           className="hidden"
         />
       </div>
+
+      {/* Names, thumbnails and per-file state — the count alone said nothing about which file was
+          which, or which one a failure belonged to. */}
+      <SelectedMediaList items={items} kind={bucket === "product-videos" ? "video" : "image"} busy />
 
       {uploaded.length > 0 && (
         <p className="font-body text-sm text-green-600">
@@ -126,6 +177,13 @@ export function ProductForm({ product, categories, collections }: ProductFormPro
     <form action={formAction} className="flex flex-col gap-8">
       {product && <input type="hidden" name="productId" value={product.id} />}
 
+      {product && (
+        <p className="border border-neutral-100 bg-pink-100/20 px-4 py-3 font-body text-base text-neutral-500">
+          Change what you need and save &mdash; anything you leave empty keeps what is already
+          saved for this product.
+        </p>
+      )}
+
       <div className="flex flex-col gap-6 border border-neutral-100 bg-white p-6">
         <h3 className="font-heading text-lg font-light uppercase tracking-widest text-neutral-500">
           Basic Information
@@ -137,7 +195,9 @@ export function ProductForm({ product, categories, collections }: ProductFormPro
               name="name"
               type="text"
               defaultValue={product?.name}
-              required
+              // Only a new product has to be named here: on an edit, an empty box keeps the name
+              // the product already has rather than blocking the save.
+              required={!product}
               className={inputClasses}
             />
           </div>
@@ -169,8 +229,8 @@ export function ProductForm({ product, categories, collections }: ProductFormPro
               className={inputClasses}
             />
             <p className="font-body text-sm text-neutral-400">
-              One short line, shown only in the header&apos;s Collection dropdown. Leave empty to use
-              the tagline there.
+              One short line, shown only in the header&apos;s Collection dropdown. With none saved, the
+              tagline is used there.
             </p>
           </div>
           <div className="flex flex-col gap-1 sm:col-span-2">
@@ -228,7 +288,7 @@ export function ProductForm({ product, categories, collections }: ProductFormPro
                 min="0"
                 step="0.01"
                 defaultValue={product?.price}
-                required
+                required={!product}
                 className={inputClasses}
               />
             </div>
@@ -318,8 +378,8 @@ export function ProductForm({ product, categories, collections }: ProductFormPro
           <p className="font-body text-sm text-neutral-500">
             Printed on the customer&apos;s tax invoice. The price above is treated as{" "}
             <strong className="font-medium">including GST</strong>, so filling these in does not
-            change what anyone pays &mdash; it only decides how the tax is shown and reported. Leave
-            either box empty to use the shop&apos;s default.
+            change what anyone pays &mdash; it only decides how the tax is shown and reported. A box
+            left empty keeps whatever is saved, and the shop&apos;s default applies until one is set.
           </p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -406,7 +466,7 @@ export function ProductForm({ product, categories, collections }: ProductFormPro
               className={inputClasses}
             />
             <p className="font-body text-xs text-neutral-300">
-              Shown on the product page accordion. Leave empty to use the standard collection text.
+              Shown on the product page accordion. With none saved, the standard collection text is shown.
             </p>
           </div>
           <div className="flex flex-col gap-1 sm:col-span-2">

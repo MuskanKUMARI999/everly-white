@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Everly White — Release Gate Checklist</title>
+<style>
+:root{
+  --bg:#EDECE8; --surface:#F8F8F6; --surface-2:#E5E4DF;
+  --ink:#1F2320; --ink-2:#5C625D; --ink-3:#878D87;
+  --rule:#D6D6D0; --rule-soft:#E2E2DC;
+  --accent:#1F5E58; --accent-soft:#DBE7E3;
+  --fail:#9C3B34; --fail-soft:#F0DDD9;
+  --shadow:0 1px 2px rgba(31,35,32,.05), 0 8px 24px -18px rgba(31,35,32,.4);
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono","Segoe UI Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151815; --surface:#1D211E; --surface-2:#252A26;
+    --ink:#E7EAE6; --ink-2:#98A199; --ink-3:#727A73;
+    --rule:#2D342E; --rule-soft:#242A25;
+    --accent:#63B6A6; --accent-soft:#1B302C;
+    --fail:#D98A80; --fail-soft:#33211E;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+h1,h2,h3{margin:0;text-wrap:balance}
+button{font:inherit;color:inherit}
+input{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+.shell{max-width:1380px;margin:0 auto;padding:0 20px 96px;display:grid;grid-template-columns:1fr}
+@media (min-width:1060px){.shell{grid-template-columns:288px minmax(0,1fr);gap:52px;padding:0 32px 120px}}
+
+.masthead{grid-column:1/-1;border-bottom:1px solid var(--rule);padding:44px 0 26px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px 32px}
+.brand{font-family:var(--serif);font-weight:700;font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--accent)}
+.masthead h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4.4vw,40px);line-height:1.1;margin-top:10px}
+.masthead .lede{margin-top:12px;max-width:62ch;color:var(--ink-2);font-size:14.5px}
+.masthead .lede b{color:var(--ink);font-weight:600}
+.stamp{border:1px solid var(--rule);background:var(--surface);border-radius:2px;padding:12px 16px;min-width:190px;box-shadow:var(--shadow)}
+.stamp .big{font-family:var(--mono);font-size:30px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
+.stamp .big span{font-size:16px;color:var(--ink-3)}
+.stamp .cap{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:8px}
+
+.rail{padding:26px 0 0}
+@media (min-width:1060px){.rail{position:sticky;top:0;align-self:start;max-height:100vh;overflow-y:auto;padding:30px 0 40px}}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:3px;padding:16px;box-shadow:var(--shadow)}
+.panel + .panel{margin-top:14px}
+.panel h2{font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:700;margin-bottom:12px}
+
+.meter{height:5px;background:var(--surface-2);border-radius:99px;overflow:hidden;display:flex}
+.meter i{display:block;height:100%;transition:width .3s ease}
+.meter .ok{background:var(--accent)}
+.meter .bad{background:var(--fail)}
+.tally{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tally div{border-left:2px solid var(--rule);padding-left:8px}
+.tally .n{font-size:19px;font-weight:500;line-height:1.2}
+.tally .k{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);font-family:var(--sans)}
+.tally .pass{border-left-color:var(--accent)} .tally .pass .n{color:var(--accent)}
+.tally .fail{border-left-color:var(--fail)} .tally .fail .n{color:var(--fail)}
+.blockers{margin-top:12px;padding-top:12px;border-top:1px solid var(--rule-soft);font-size:12.5px;color:var(--ink-2)}
+.blockers b{color:var(--fail);font-family:var(--mono)}
+
+.fields{display:grid;gap:9px}
+.field label{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.field input{width:100%;background:transparent;border:0;border-bottom:1px solid var(--rule);padding:3px 0 4px;color:var(--ink);font-size:13.5px;border-radius:0;font-family:var(--mono)}
+.field input:focus{outline:none;border-bottom-color:var(--accent)}
+.field input::placeholder{color:var(--ink-3);opacity:.7;font-family:var(--sans)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--rule);background:transparent;border-radius:99px;padding:4px 11px;font-size:12px;cursor:pointer;color:var(--ink-2);transition:background .15s,color .15s,border-color .15s}
+.chip:hover{border-color:var(--ink-3);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#101413}}
+
+.index{display:grid;gap:1px}
+.index a{display:flex;align-items:baseline;gap:9px;text-decoration:none;color:var(--ink-2);padding:5px 6px;border-radius:2px;font-size:13px}
+.index a:hover{background:var(--surface-2);color:var(--ink)}
+.index .num{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);width:16px;flex:none}
+.index .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.index .ct{font-family:var(--mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none}
+.index a.done .ct{color:var(--accent)}
+.index a.hasfail .ct{color:var(--fail)}
+
+.railbtns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{border:1px solid var(--rule);background:var(--surface);border-radius:2px;padding:7px 12px;font-size:12.5px;cursor:pointer;color:var(--ink-2)}
+.btn:hover{border-color:var(--ink-3);color:var(--ink)}
+.btn.danger:hover{border-color:var(--fail);color:var(--fail)}
+.saveline{margin-top:12px;font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:7px;min-height:17px}
+.dot{width:6px;height:6px;border-radius:99px;background:var(--accent);flex:none}
+.saveline.warn{color:var(--fail)} .saveline.warn .dot{background:var(--fail)}
+
+main{padding-top:26px;min-width:0}
+@media (min-width:1060px){main{padding-top:30px}}
+.phase{margin-bottom:44px;scroll-margin-top:16px}
+.phase-head{display:flex;align-items:baseline;gap:14px;padding-bottom:9px;border-bottom:1.5px solid var(--ink);position:sticky;top:0;background:var(--bg);z-index:5;padding-top:10px}
+.phase-head .n{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:500;letter-spacing:.06em;flex:none}
+.phase-head h2{font-family:var(--serif);font-size:19px;font-weight:400;flex:1;min-width:0}
+.phase-head .ct{font-family:var(--mono);font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none}
+.phase-note{color:var(--ink-2);font-size:13.5px;margin:10px 0 4px;max-width:70ch}
+
+.rows{border-top:1px solid var(--rule-soft)}
+.row{display:grid;grid-template-columns:32px 1fr;gap:12px;padding:11px 8px 11px 4px;border-bottom:1px solid var(--rule-soft);align-items:start}
+.row:hover{background:var(--surface)}
+.row.s1{background:linear-gradient(90deg,var(--accent-soft) 0 3px,transparent 3px)}
+.row.s1:hover{background:linear-gradient(90deg,var(--accent-soft) 0 3px,var(--surface) 3px)}
+.row.s2{background:linear-gradient(90deg,var(--fail) 0 3px,var(--fail-soft) 3px)}
+.row.s1 .what{color:var(--ink-2)}
+.row.s1 .what b{text-decoration:line-through;text-decoration-color:var(--ink-3)}
+.tick{width:24px;height:24px;margin-top:1px;border:1.5px solid var(--rule);border-radius:3px;background:transparent;cursor:pointer;display:grid;place-items:center;color:transparent;transition:border-color .15s,background .15s,color .15s}
+.tick:hover{border-color:var(--accent)}
+.tick svg{width:14px;height:14px;stroke-width:2.4;fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round}
+.row.s1 .tick{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .row.s1 .tick{color:#101413}}
+.row.s2 .tick{background:var(--fail);border-color:var(--fail);color:#fff}
+.what{font-size:14.5px;min-width:0}
+.what b{font-weight:600}
+.expect{display:block;color:var(--ink-2);font-size:13px;margin-top:2px}
+.expect::before{content:"\2192 ";color:var(--ink-3)}
+.tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:5px}
+.id{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--ink-3)}
+.p1{font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;color:var(--fail);border:1px solid currentColor;border-radius:2px;padding:0 5px;line-height:15px}
+.note{grid-column:2;margin-top:8px;width:100%;background:var(--surface);border:1px solid var(--fail);border-radius:2px;padding:7px 9px;font-size:13px;color:var(--ink)}
+.note:focus{outline:none;box-shadow:0 0 0 2px var(--fail-soft)}
+.empty{padding:26px 4px;color:var(--ink-3);font-size:13.5px}
+footer{grid-column:1/-1;border-top:1px solid var(--rule);margin-top:8px;padding-top:18px;color:var(--ink-3);font-size:12.5px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+footer code{font-family:var(--mono);color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001ms !important;transition-duration:.001ms !important}}
+
+@media print{
+  :root{--bg:#fff;--surface:#fff;--ink:#000;--ink-2:#333;--ink-3:#666;--rule:#bbb;--rule-soft:#ddd;--shadow:none}
+  .rail{display:none !important}
+  .shell{display:block;max-width:none;padding:0}
+  .phase-head{position:static}
+  .row{break-inside:avoid;page-break-inside:avoid}
+  .phase{margin-bottom:22px}
+  .tick{border-color:#333}
+  a{text-decoration:none;color:inherit}
+}
+</style>
+</head>
+<body>
+<div class="shell" id="app"></div>
+<script>
+(function(){
+  "use strict";
+
+  var PHASES = [
+    { code:"ENV", name:"Environment & pre-flight",
+      note:"Nothing below is worth running until this passes — most \"bugs\" found on a fresh deployment are a missing key or an unapplied migration.",
+      items:[
+        {i:1,t:"<b>npm install</b> then <b>npm run build</b> on Node 20.9+",e:"Build completes with no TypeScript or ESLint errors",p:1},
+        {i:2,t:"<b>npm run lint</b>",e:"No errors reported",p:2},
+        {i:3,t:"Supabase URL, anon key and service-role key are set in the deployment environment",e:"App boots and the home page loads live product data",p:1},
+        {i:4,t:"Every migration 001 → 039 has been run, in order, in the Supabase SQL editor",e:"Tables, RPCs (decrement_product_stock, increment_coupon_usage, issue_invoice) and RLS policies all exist",p:1},
+        {i:5,t:"Storage buckets <b>product-images</b>, <b>product-videos</b> and <b>review-photos</b> exist",e:"Public read; no INSERT grant for anon or authenticated roles",p:1},
+        {i:6,t:"<b>NEXT_PUBLIC_SITE_URL</b> is set in the build environment <i>before</i> the build runs",e:"View source on a built page: canonical/OG tags carry the live origin, never localhost",p:1},
+        {i:7,t:"Promote the shop owner with <b>npx tsx scripts/make-admin.ts &lt;email&gt;</b>",e:"profiles.is_admin is true and /admin opens for them",p:1},
+        {i:8,t:"Catalog content is in place (scripts/seed.ts, scripts/seedReviews.ts, or entered by hand)",e:"Products, collections and blog posts render on the storefront",p:2},
+        {i:9,t:"Razorpay key id and secret are set",e:"Checkout does <i>not</i> say \"payments aren't connected yet\"",p:1},
+        {i:10,t:"Razorpay webhook registered against <b>/api/webhooks/razorpay</b> with RAZORPAY_WEBHOOK_SECRET matching the dashboard",e:"A test delivery from the Razorpay dashboard returns 200",p:1},
+        {i:11,t:"Resend key set, RESEND_FROM_EMAIL on a verified domain — run <b>npx tsx scripts/send-test-email.ts</b>",e:"Test message is delivered, not just accepted",p:1},
+        {i:12,t:"ADMIN_ALERT_EMAIL and RESEND_REPLY_TO point at inboxes someone actually reads",e:"Both addresses receive a test message",p:2},
+        {i:13,t:"<b>npx tsx scripts/set-invoice-start.ts</b> has been run once",e:"The first invoice raised continues the client's existing serial, it does not restart at 1",p:1},
+        {i:14,t:"Seller block in src/lib/invoices/sellerDetails.ts checked against the GST certificate",e:"GSTIN, legal name, address, PIN and the 12% / HSN 44219090 default all match",p:1},
+        {i:15,t:"Serve a production build with <b>npm run start</b>, not the dev server",e:"Every check below is run against that build at least once",p:1}
+      ]},
+
+    { code:"SHOP", name:"Storefront & content",
+      note:"What an unknown visitor sees. Walk it signed out, in a clean browser profile.",
+      items:[
+        {i:1,t:"Home page renders every section — hero, bestsellers, collection tabs, shop by category, video showcase, testimonials, journal, Instagram, newsletter",e:"No blank blocks, no broken images, no placeholder copy",p:2},
+        {i:2,t:"Announcement bar sits above the header on storefront pages",e:"Copy is current and correct",p:2},
+        {i:3,t:"Header mega-menu is built from live collections",e:"Every product link opens a real product page — no 404s",p:1},
+        {i:4,t:"Search from the header for a piece you know exists",e:"It is returned; a two-word query (\"mirror plate\") narrows the results rather than widening them",p:2},
+        {i:5,t:"Open /search with no query, then with a nonsense query",e:"Prompt state and empty state respectively — never an error",p:2},
+        {i:6,t:"/collection redirects, and /collection/&lt;slug&gt; renders",e:"Hero, editorial layout, stats strip and trust bar all present with the collection's own copy",p:2},
+        {i:7,t:"/products — apply a category filter, a price band, and each sort (Featured, price ↑, price ↓, name)",e:"Grid changes and the \"showing X of Y\" line matches what is on screen",p:2},
+        {i:8,t:"Press Reset on the catalog",e:"Returns to Featured / All categories / any price",p:2},
+        {i:9,t:"Product page gallery — click through thumbnails, play a product video",e:"Main image swaps; video plays inline",p:2},
+        {i:10,t:"Product page shows tagline, story, details accordion, perks, making split, approved reviews and related pieces",e:"All sections populated from the record, up to 4 related items, none of them the product itself",p:2},
+        {i:11,t:"Visit /products/does-not-exist",e:"Styled 404 page, not a server error",p:1},
+        {i:12,t:"Blog index and a single post, including the share buttons",e:"Only published posts listed; content blocks render; share links open the right target",p:2},
+        {i:13,t:"About, Gifts, FAQs, Reviews, Contact, Privacy, Terms and Return pages",e:"All render with the client's final copy",p:2},
+        {i:14,t:"Land on the home page and wait",e:"Welcome popup appears after about a second, and not again for 24 hours",p:2},
+        {i:15,t:"Reload straight onto /cart, /checkout, /login, /signup, /forgot-password, /reset-password and /admin",e:"Welcome popup never appears on any of them",p:1},
+        {i:16,t:"Sign in as a customer who has already ordered, or already subscribed, and browse",e:"Welcome popup is suppressed for them",p:2},
+        {i:17,t:"Open /cart, /checkout and the auth screens",e:"Header collapses to the bare logo and the marketing footer is gone",p:2}
+      ]},
+
+    { code:"CART", name:"Bag, coupons & wishlist",
+      note:"Run the whole phase signed out first, then repeat the merge checks with an account.",
+      items:[
+        {i:1,t:"Add a piece to the bag from a product page as a guest",e:"Header badge increments and /cart lists it at the right price",p:1},
+        {i:2,t:"Hard-reload, then open the site in a second tab",e:"Bag still holds the item (guest_id cookie)",p:1},
+        {i:3,t:"Use the +/− stepper on a piece with only 1 or 2 in stock",e:"Stops at the real stock level, and never above 9",p:1},
+        {i:4,t:"Remove a single line, then clear the whole bag",e:"Totals recalculate; empty state renders",p:2},
+        {i:5,t:"Apply a coupon code to an empty bag",e:"Refused — \"add something to your cart before applying a code\"",p:2},
+        {i:6,t:"Apply a valid percentage code (e.g. WELCOME5)",e:"Discount line appears and the total drops by a whole-rupee amount",p:1},
+        {i:7,t:"Try an expired code, a used-up code, a code below its minimum order, and a nonsense code",e:"Four distinct, plain-English messages",p:2},
+        {i:8,t:"Apply a code, then remove the bag's items one at a time",e:"Code is dropped — it does not silently reattach to the next piece added",p:1},
+        {i:9,t:"Apply a code, then expire it (or exhaust it) in the admin panel, then reload the bag",e:"Code is quietly cleared with no error shown to the shopper",p:2},
+        {i:10,t:"Remove coupon",e:"Discount disappears and the total returns to the subtotal",p:2},
+        {i:11,t:"Check subtotal, discount, shipping and grand total against a hand calculation",e:"All four agree; shipping is free",p:1},
+        {i:12,t:"Fill a bag signed out, then sign in",e:"Guest bag merges into the account bag, quantities capped at 9, guest bag gone",p:1},
+        {i:13,t:"Fill a bag signed out, then sign up and confirm by email",e:"Same merge happens when the confirmation link lands",p:1},
+        {i:14,t:"Save a piece to the wishlist signed out, then sign in",e:"It is in /account/wishlist",p:1},
+        {i:15,t:"Double-click Save, or save the same piece from two tabs",e:"One wishlist row, no error",p:2},
+        {i:16,t:"Wishlist count in the account sidebar",e:"Matches the number of saved pieces",p:2}
+      ]},
+
+    { code:"AUTH", name:"Accounts & sessions",
+      note:"Email confirmation must be ON in Supabase — guest orders are only claimed for confirmed addresses.",
+      items:[
+        {i:1,t:"Sign up with blank fields, a 7-character password, a mismatched confirmation, and the terms box unticked",e:"Each is blocked with its own specific message",p:2},
+        {i:2,t:"Sign up with an address that already has an account",e:"\"An account with this email already exists\" — no duplicate created",p:1},
+        {i:3,t:"Open the confirmation email and follow the link",e:"Lands signed in on the live site (not localhost), name and phone carried onto the profile",p:1},
+        {i:4,t:"Sign in with a wrong password, then the right one",e:"Rejected, then signed in and returned to the home page",p:1},
+        {i:5,t:"Visit /account/orders while signed out",e:"Redirected to /login?next=/account/orders; after signing in you land on that exact page, query string intact",p:1},
+        {i:6,t:"Hand-edit the URL to /login?next=https://example.com and sign in",e:"The external target is ignored — you stay on the site",p:1},
+        {i:7,t:"Visit /login while already signed in",e:"Redirected to /account, with no redirect loop",p:2},
+        {i:8,t:"Forgot password → email → link → set a new password → sign in with it",e:"Whole chain works end to end",p:1},
+        {i:9,t:"Re-use the same reset link a second time",e:"\"Your reset link is invalid or has expired\" — no crash",p:2},
+        {i:10,t:"Account → Details: change the name and phone",e:"Saved, and the sidebar greeting updates without a hard reload",p:2},
+        {i:11,t:"Change password with the wrong current password, then with a new password equal to the old one",e:"Both refused with their own message",p:1},
+        {i:12,t:"Change the password successfully",e:"Session stays alive; the old password no longer signs in",p:1},
+        {i:13,t:"Address book: add, edit and delete addresses",e:"Each action persists and reflects immediately",p:1},
+        {i:14,t:"Tick \"default\" on a second address, then delete the default one",e:"Exactly one default at all times — never zero, never two",p:1},
+        {i:15,t:"Address form with a 5-digit PIN, a letters-only phone, and an unrecognised state",e:"All three refused; Country is fixed to India and cannot be edited",p:1},
+        {i:16,t:"Account dashboard counts",e:"Order and wishlist figures match the real records",p:2},
+        {i:17,t:"Sign out",e:"Session cleared; /account bounces back to /login",p:1}
+      ]},
+
+    { code:"PAY", name:"Checkout & payment",
+      note:"Use Razorpay test cards. Item PAY-12 and PAY-13 are the ones that quietly break in production — do not skip them.",
+      items:[
+        {i:1,t:"Guest checkout with the form left blank",e:"Every required field is enforced before an order is created",p:1},
+        {i:2,t:"Signed-in checkout",e:"Name, email and phone prefilled; saved addresses listed default-first",p:2},
+        {i:3,t:"Select a saved address, then switch to \"new address\"",e:"Shipping fields fill, then clear",p:2},
+        {i:4,t:"Enter an invalid email and a 5-digit PIN",e:"Both refused client-side before any order row is written",p:1},
+        {i:5,t:"Check the order summary against the bag",e:"Line prices, discount and total all match",p:1},
+        {i:6,t:"Press Pay and look at the orders table in Supabase",e:"Row created with status <code>pending</code> and payment_status <code>pending</code>",p:1},
+        {i:7,t:"Razorpay window opens",e:"Amount is the exact total in paisa (₹1,709.05 → 170905) with name, email and phone prefilled",p:1},
+        {i:8,t:"Complete payment with a test card",e:"Confirmation screen with the order number; bag emptied; order is confirmed/paid",p:1},
+        {i:9,t:"Open the Razorpay window and close it without paying",e:"Order stays pending, bag is <i>not</i> cleared, stock unchanged",p:1},
+        {i:10,t:"Pay with a card Razorpay declines",e:"Error surfaced, order stays pending",p:1},
+        {i:11,t:"Pay, then close the tab before the confirmation screen appears",e:"Webhook still flips the order to confirmed — check the order row and the customer's inbox",p:1},
+        {i:12,t:"Let the browser callback and the webhook both land for one order",e:"Stock decremented once, one confirmation email, coupon counted once",p:1},
+        {i:13,t:"Compare stock before and after a paid order",e:"Falls by exactly the ordered quantity; a piece that hits zero can no longer be added",p:1},
+        {i:14,t:"Check coupons.uses_count after an abandoned order and after a paid one",e:"Only the paid one increments it",p:1},
+        {i:15,t:"Order more units than remain in stock (edit quantity, or race two tabs)",e:"Refused server-side with \"Not enough stock for …\"",p:1},
+        {i:16,t:"Make a product unavailable in admin while it sits in a bag, then check out",e:"Refused, naming the piece",p:2},
+        {i:17,t:"POST a forged Razorpay signature to the verify step",e:"\"Payment verification failed\" and the order stays pending",p:1},
+        {i:18,t:"Send the webhook a bad signature; then unset RAZORPAY_WEBHOOK_SECRET and resend; then send an unrelated event",e:"400, then 503, then 200 with no side effects",p:1},
+        {i:19,t:"Remove the Razorpay keys and check out",e:"Checkout says it is simulated and completes without charging anyone",p:2}
+      ]},
+
+    { code:"ORD", name:"Orders, cancellation & invoices",
+      note:"Invoices are tax documents — the GST split and the serial number are the two things that must never be wrong.",
+      items:[
+        {i:1,t:"/track-order with the correct order number and email",e:"Order and its lines are returned",p:1},
+        {i:2,t:"/track-order with a wrong email, then with an order number that does not exist",e:"Byte-identical \"we couldn't find an order\" message for both",p:1},
+        {i:3,t:"Track a guest order and an account holder's order while signed out",e:"Both resolve",p:2},
+        {i:4,t:"/account/orders",e:"Customer's orders, newest first, with correct status pills",p:1},
+        {i:5,t:"Cancel an unshipped order within 4 hours of placing it",e:"Cancel control is offered and works",p:1},
+        {i:6,t:"Cancel a <i>paid</i> order",e:"Refund raised in Razorpay, stock restored, coupon use released, refund id recorded",p:1},
+        {i:7,t:"Try to cancel an order that is shipped, one already cancelled, and one older than 4 hours",e:"Each refused with its own reason",p:1},
+        {i:8,t:"As admin, set an order the customer already cancelled to cancelled again",e:"No second restock (cancelled_at guards it)",p:1},
+        {i:9,t:"Download the invoice from your own order card",e:"PDF downloads with a sensible filename",p:1},
+        {i:10,t:"Download any customer's invoice as an admin",e:"Allowed",p:2},
+        {i:11,t:"Signed in as a different customer, request someone else's invoice",e:"404 — not 403, and not a message confirming the order exists",p:1},
+        {i:12,t:"As a guest, download an invoice with order number + email, then retry with a wrong email",e:"PDF, then 404",p:1},
+        {i:13,t:"Request the invoice for an order that was never paid",e:"409 with a plain explanation",p:2},
+        {i:14,t:"Request the invoice for a refunded order",e:"Still available — the sale did happen",p:2},
+        {i:15,t:"Download the same invoice five times and check the invoices table",e:"One row, one invoice number — no second serial allocated",p:1},
+        {i:16,t:"Place an order to an Assam address and one to any other state",e:"CGST + SGST on the first, IGST on the second",p:1},
+        {i:17,t:"Read a printed invoice end to end",e:"Seller block, GSTIN, buyer, HSN-wise summary, amount in words, discount line and the real payment method (\"Debit Card — Visa ••••1111\")",p:1},
+        {i:18,t:"Reconcile the invoice totals against the order total",e:"Agree to the paisa, including rounding",p:1},
+        {i:19,t:"Inspect the invoice response headers",e:"<code>Cache-Control: private, no-store</code>",p:2}
+      ]},
+
+    { code:"MAIL", name:"Transactional email",
+      note:"Check in a real inbox, not just the Resend log — delivered is not the same as accepted.",
+      items:[
+        {i:1,t:"Order confirmation email after a paid order",e:"Order number, lines, totals and shipping address all correct",p:1},
+        {i:2,t:"Click every link in that email, and check the logo",e:"All point at the live site — nothing resolves to localhost",p:1},
+        {i:3,t:"View the same email as plain text",e:"Readable plain-text part, not an empty body",p:2},
+        {i:4,t:"New-order alert",e:"Arrives at ADMIN_ALERT_EMAIL with the order's details",p:1},
+        {i:5,t:"Mark an order shipped with a courier and tracking number",e:"Customer is emailed, and the email carries both",p:1},
+        {i:6,t:"Mark orders delivered, cancelled and refunded",e:"Each sends its own distinct email",p:1},
+        {i:7,t:"Re-save an order without changing its status (e.g. fix a typo in the tracking number)",e:"No email is sent",p:1},
+        {i:8,t:"Update an order that has no email on file",e:"Save succeeds and the note says the customer was not notified",p:2},
+        {i:9,t:"Subscribe from the footer form",e:"Welcome email arrives carrying the WELCOME5 code",p:2},
+        {i:10,t:"Subscribe the same address a second time",e:"\"You're already subscribed\" — no second email, no second code",p:1},
+        {i:11,t:"Use the WELCOME5 code from that email at checkout",e:"Applies — the code in the email and the code in the popup are the same one",p:1},
+        {i:12,t:"Submit the contact form",e:"Message stored and an alert reaches the shop inbox",p:1},
+        {i:13,t:"Reply to a transactional email",e:"Lands in RESEND_REPLY_TO, not a dead send-only mailbox",p:2},
+        {i:14,t:"Unset RESEND_API_KEY and place an order",e:"Order completes; mail is skipped and logged; nothing errors for the customer",p:1},
+        {i:15,t:"Password reset email",e:"Arrives, and its link signs you in to set a new password",p:1}
+      ]},
+
+    { code:"ADM", name:"Admin panel",
+      note:"Run the whole phase as the client would, on a laptop and then on a phone.",
+      items:[
+        {i:1,t:"Visit /admin signed out",e:"Redirected away",p:1},
+        {i:2,t:"Visit /admin and a few /admin/* pages as an ordinary signed-in customer",e:"Redirected away from every one of them",p:1},
+        {i:3,t:"Look at the admin chrome",e:"No announcement bar, no mega-menu, no marketing footer — admin shell only",p:2},
+        {i:4,t:"Dashboard figures and the sales chart",e:"Revenue, order and customer counts match the data; the chart buckets by IST days",p:2},
+        {i:5,t:"Open an order and change status, payment status, courier, tracking number and refund id",e:"Saved, and the confirmation note says what actually happened",p:1},
+        {i:6,t:"Cancel a paid order from the admin order screen",e:"Stock restored, coupon released, note reminds you to refund in Razorpay if not already done",p:1},
+        {i:7,t:"Create a product with images and a video, then find it on the storefront",e:"Appears in the catalog, search, its collection and the sitemap",p:1},
+        {i:8,t:"Upload an image over 1MB, and a video",e:"Uploads via the signed URL with no request-size error",p:1},
+        {i:9,t:"Edit alt text, set the main photo, reorder the gallery, delete an image",e:"All four take effect on the storefront, and the deleted file is gone from Storage",p:2},
+        {i:10,t:"Toggle a product to unavailable",e:"Disappears from the catalog, search results and the sitemap",p:1},
+        {i:11,t:"Change a product's stock quantity",e:"Product page stepper cap follows immediately",p:2},
+        {i:12,t:"Delete a product that has already been ordered",e:"The order line keeps its frozen name, price and image",p:1},
+        {i:13,t:"Categories: create, rename, delete",e:"Catalog filter list updates",p:2},
+        {i:14,t:"Collections: edit the metadata copy — eyebrow, intro, stats, founder note, nav image and tagline",e:"Each change shows on the collection page, the mega-menu cell and the home tile",p:2},
+        {i:15,t:"Banners: create, edit, delete",e:"Storefront reflects each change",p:2},
+        {i:16,t:"Reviews: approve one, use approve-all, delete one",e:"Unapproved reviews are invisible on the storefront until approved",p:1},
+        {i:17,t:"Blog: create a draft, edit its blocks, publish it, then delete it",e:"Draft hidden, published post visible at its slug",p:2},
+        {i:18,t:"Newsletter: list subscribers, delete one, export CSV",e:"Deleted subscriber is gone; CSV opens cleanly",p:2},
+        {i:19,t:"Contact: check the unread badge, resolve one, resolve all, delete one",e:"Badge counts unresolved messages only and updates after each action",p:2},
+        {i:20,t:"Customers list and export",e:"Real customers listed; CSV downloads",p:2},
+        {i:21,t:"Open all four CSV exports in a spreadsheet",e:"Commas and quotes inside product names do not break the columns",p:2},
+        {i:22,t:"Request /api/admin/export/orders while signed out",e:"401 Unauthorized",p:1},
+        {i:23,t:"Use the admin panel on a phone",e:"Sidebar becomes a drawer and every section is reachable",p:2}
+      ]},
+
+    { code:"SEC", name:"Security & access control",
+      note:"Guest bags, guest orders and invoices are all protected in application code rather than by RLS — these checks are how you know that boundary holds.",
+      items:[
+        {i:1,t:"Search the built client bundle in .next/static for the service-role key",e:"Not present anywhere",p:1},
+        {i:2,t:"Run <code>document.cookie</code> in the browser console",e:"The guest_id cookie is not readable (httpOnly)",p:1},
+        {i:3,t:"Using the anon key alone, select from orders, newsletter_subscribers and contact_submissions",e:"No rows returned",p:1},
+        {i:4,t:"As an ordinary signed-in customer, invoke an admin server action from devtools",e:"\"Unauthorized\"",p:1},
+        {i:5,t:"Request a media upload URL with a folder value containing <code>../</code>",e:"Rejected — the path cannot escape its bucket folder",p:1},
+        {i:6,t:"Probe a sequence of invented order numbers on track-order and the invoice endpoint",e:"Identical response whether the order does not exist or is simply not yours",p:1},
+        {i:7,t:"Try to cancel an order belonging to another account",e:"\"Order not found\"",p:1},
+        {i:8,t:"Place a guest order, then sign up with that address but do not confirm it",e:"The guest order is not claimed until the address is confirmed",p:1},
+        {i:9,t:"Two browsers buy the last unit at the same moment",e:"Only one succeeds; stock never goes negative",p:1},
+        {i:10,t:"Two paid orders use a coupon sitting at max_uses − 1",e:"uses_count never exceeds max_uses",p:2},
+        {i:11,t:"Submit a review as a customer",e:"Not visible on the storefront until an admin approves it",p:1},
+        {i:12,t:"Open /reset-password directly with no recovery session",e:"Refuses politely rather than throwing",p:2}
+      ]},
+
+    { code:"RWD", name:"Responsive & accessible",
+      note:"Test at 320px first — it is where the bag and checkout break, and it is a real phone width.",
+      items:[
+        {i:1,t:"Walk the whole site at 320, 375, 768, 1024 and 1440px",e:"No horizontal page scroll on any page at any width",p:1},
+        {i:2,t:"Below the md breakpoint, look at the header",e:"Hamburger sits at the left edge, level with the logo; account actions live inside the drawer; nothing crowds the logo",p:2},
+        {i:3,t:"Narrow the window past the lg breakpoint",e:"Mega-menu gives way to the drawer, which carries the same links",p:2},
+        {i:4,t:"Bag, checkout and account pages at 320px",e:"Quantity stepper and price sit on separate lines if needed; the price never breaks mid-number",p:1},
+        {i:5,t:"Admin tables on a narrow screen",e:"Table scrolls inside its own container, the page does not",p:2},
+        {i:6,t:"Press Escape on the welcome popup, the nav drawer and the admin drawer",e:"Each closes and focus returns somewhere sensible",p:2},
+        {i:7,t:"Tab through the site with the keyboard only",e:"Every control has a visible focus ring and a sensible tab order",p:1},
+        {i:8,t:"Complete a whole checkout using only the keyboard",e:"Possible from first field to payment",p:1},
+        {i:9,t:"Inspect images and icon-only buttons",e:"Meaningful alt text; aria-labels on icon buttons",p:2},
+        {i:10,t:"Turn on \"reduce motion\" in the OS and browse",e:"Page transitions and reveal animations stop",p:2},
+        {i:11,t:"Submit a form with errors while using a screen reader",e:"The error is announced, not just coloured red",p:2},
+        {i:12,t:"Look at the order status pills in greyscale",e:"Status is still distinguishable without colour",p:2}
+      ]},
+
+    { code:"SEO", name:"Search, metadata & resilience",
+      note:"Run against the production build with the live NEXT_PUBLIC_SITE_URL baked in.",
+      items:[
+        {i:1,t:"Open /sitemap.xml",e:"Home, products, collections, blog posts and the static pages, all on the live absolute origin",p:1},
+        {i:2,t:"Search the sitemap for private routes",e:"No /cart, /checkout, /account, /admin, /orders, /api, /search or /collection entry",p:1},
+        {i:3,t:"Unpublish a blog post and make a product unavailable, then reload the sitemap",e:"Both are absent",p:1},
+        {i:4,t:"Open /robots.txt",e:"Private routes disallowed, correct host, sitemap URL present",p:2},
+        {i:5,t:"Check the title and description on the home page, a product page and a blog post",e:"Each is unique and generated from the record",p:2},
+        {i:6,t:"Paste a product URL into Slack or WhatsApp",e:"Preview shows the right image, title and description",p:2},
+        {i:7,t:"Visit an unknown blog slug and an unknown collection slug",e:"Both return the styled 404",p:2},
+        {i:8,t:"Watch product images load on a throttled connection",e:"Served through next/image at sensible sizes with no visible layout shift",p:2},
+        {i:9,t:"Run Lighthouse on the home page and a product page",e:"No red accessibility or best-practice findings",p:2},
+        {i:10,t:"Re-run every P1 check above against the production build",e:"Behaves identically to the dev server",p:1}
+      ]}
+  ];
+
+  /* ── state ─────────────────────────────────────────────
+     Everything lives in this browser's localStorage. No account, no
+     network, no server — open the file and tick. Each person who opens
+     their own copy keeps their own run.                              */
+
+  var KEY  = "everly-white-release-gate";
+  var PREF = "everly-white-release-gate-prefs";
+
+  var state = {meta:{tester:"",build:"",env:"",date:""}, items:{}};
+  var storageOk = true;
+  try{
+    var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+    if(saved){
+      if(saved.items && typeof saved.items === "object") state.items = saved.items;
+      if(saved.meta) for(var k in state.meta){ if(typeof saved.meta[k] === "string") state.meta[k] = saved.meta[k]; }
+    }
+  }catch(e){ storageOk = false; }
+
+  var prefs = {filter:"all", p1only:false};
+  try{
+    var p = JSON.parse(localStorage.getItem(PREF) || "null");
+    if(p){ if(p.filter) prefs.filter = p.filter; prefs.p1only = !!p.p1only; }
+  }catch(e){}
+
+  function save(){
+    try{
+      localStorage.setItem(KEY, JSON.stringify(state));
+      storageOk = true;
+      flash("Saved in this browser");
+    }catch(e){
+      storageOk = false;
+      flash("This browser is blocking saving — print or copy the report before closing", true);
+    }
+  }
+  function savePrefs(){ try{ localStorage.setItem(PREF, JSON.stringify(prefs)); }catch(e){} }
+
+  var flashTimer = null;
+  function flash(msg, warn){
+    var el = document.getElementById("saveline");
+    if(!el) return;
+    el.className = "saveline" + (warn ? " warn" : "");
+    el.innerHTML = '<span class="dot"></span><span></span>';
+    el.lastChild.textContent = msg;
+    if(flashTimer) clearTimeout(flashTimer);
+    if(!warn) flashTimer = setTimeout(idleLine, 2200);
+  }
+  function idleLine(){
+    flash(storageOk ? "Ticks are saved automatically in this browser"
+                    : "Saving is blocked here — print or copy the report before closing", !storageOk);
+  }
+
+  function idOf(phase, item){ return phase.code + "-" + (item.i < 10 ? "0" : "") + item.i; }
+  function stateOf(id){ var r = state.items[id]; return r && r.s ? r.s : 0; }
+  function noteOf(id){ var r = state.items[id]; return (r && r.n) || ""; }
+
+  var ALL = [];
+  PHASES.forEach(function(ph){ ph.items.forEach(function(it){ ALL.push({ph:ph, it:it, id:idOf(ph,it)}); }); });
+
+  function counts(list){
+    var c = {total:list.length, pass:0, fail:0, open:0};
+    list.forEach(function(r){
+      var s = stateOf(r.id);
+      if(s === 1) c.pass++; else if(s === 2) c.fail++; else c.open++;
+    });
+    return c;
+  }
+
+  function visible(){
+    return ALL.filter(function(r){
+      if(prefs.p1only && r.it.p !== 1) return false;
+      var s = stateOf(r.id);
+      if(prefs.filter === "open") return s === 0;
+      if(prefs.filter === "pass") return s === 1;
+      if(prefs.filter === "fail") return s === 2;
+      return true;
+    });
+  }
+
+  /* ── rendering ─────────────────────────────────────── */
+
+  var TICK  = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5"/></svg>';
+  var CROSS = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+
+  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+  function render(){
+    var app = document.getElementById("app");
+    var all = counts(ALL);
+    var pct = all.total ? Math.round((all.pass / all.total) * 100) : 0;
+    var vis = visible();
+    var byPhase = {};
+    vis.forEach(function(r){ (byPhase[r.ph.code] = byPhase[r.ph.code] || []).push(r); });
+    var openP1 = ALL.filter(function(r){ return r.it.p === 1 && stateOf(r.id) !== 1; });
+    var failed = ALL.filter(function(r){ return stateOf(r.id) === 2; });
+
+    var html = "";
+
+    html += '<div class="masthead"><div>'
+      + '<div class="brand">Everly White</div>'
+      + '<h1>Release Gate</h1>'
+      + '<p class="lede">Every check that has to pass before this storefront takes a real payment. '
+      + 'Work down the phases in order — <b>click a row once for pass, twice to flag a defect</b>, and leave a note on anything that fails. '
+      + 'Your ticks save automatically in this browser.</p>'
+      + '</div><div class="stamp">'
+      + '<div class="big">' + pct + '<span>%</span></div>'
+      + '<div class="cap">' + all.pass + ' of ' + all.total + ' passed</div>'
+      + '</div></div>';
+
+    html += '<div class="rail">';
+
+    html += '<div class="panel"><h2>Run status</h2>'
+      + '<div class="meter"><i class="ok" style="width:' + (all.total ? all.pass/all.total*100 : 0) + '%"></i>'
+      + '<i class="bad" style="width:' + (all.total ? all.fail/all.total*100 : 0) + '%"></i></div>'
+      + '<div class="tally">'
+      + '<div class="pass"><div class="n">' + all.pass + '</div><div class="k">Passed</div></div>'
+      + '<div class="fail"><div class="n">' + all.fail + '</div><div class="k">Failed</div></div>'
+      + '<div><div class="n">' + all.open + '</div><div class="k">Untested</div></div>'
+      + '</div>';
+    if(openP1.length || failed.length){
+      html += '<div class="blockers">'
+        + (failed.length ? '<b>' + failed.length + ' defect' + (failed.length>1?'s':'') + ' open.</b> ' : '')
+        + (openP1.length ? openP1.length + ' release-blocking check' + (openP1.length>1?'s':'') + ' still unproven.'
+                         : 'Every release-blocking check has passed.')
+        + '</div>';
+    } else {
+      html += '<div class="blockers">Every check has passed. Clear to ship.</div>';
+    }
+    html += '<div id="saveline" class="saveline"></div></div>';
+
+    var fields = [
+      {k:"tester", l:"Tested by", ph:"name"},
+      {k:"build",  l:"Build / commit", ph:"179e456"},
+      {k:"env",    l:"Environment", ph:"staging"},
+      {k:"date",   l:"Date", ph:"2026-08-26"}
+    ];
+    html += '<div class="panel"><h2>This run</h2><div class="fields">';
+    fields.forEach(function(f){
+      html += '<div class="field"><label for="m-' + f.k + '">' + f.l + '</label>'
+        + '<input id="m-' + f.k + '" data-meta="' + f.k + '" value="' + esc(state.meta[f.k] || "") + '" placeholder="' + f.ph + '"></div>';
+    });
+    html += '</div></div>';
+
+    html += '<div class="panel"><h2>Show</h2><div class="chips">';
+    [["all","Everything"],["open","Untested"],["fail","Defects"],["pass","Passed"]].forEach(function(f){
+      html += '<button class="chip" data-filter="' + f[0] + '" aria-pressed="' + (prefs.filter===f[0]) + '">' + f[1] + '</button>';
+    });
+    html += '<button class="chip" data-p1 aria-pressed="' + prefs.p1only + '">Blockers only</button></div>'
+      + '<div class="railbtns">'
+      + '<button class="btn" id="copy">Copy report</button>'
+      + '<button class="btn" id="print">Print / PDF</button>'
+      + '<button class="btn danger" id="reset">Reset</button>'
+      + '</div></div>';
+
+    html += '<div class="panel"><h2>Phases</h2><div class="index">';
+    PHASES.forEach(function(ph, n){
+      var c = counts(ALL.filter(function(r){ return r.ph.code === ph.code; }));
+      var cls = c.fail ? "hasfail" : (c.pass === c.total ? "done" : "");
+      html += '<a class="' + cls + '" href="#ph-' + ph.code + '">'
+        + '<span class="num">' + (n+1 < 10 ? "0" : "") + (n+1) + '</span>'
+        + '<span class="nm">' + ph.name + '</span>'
+        + '<span class="ct">' + c.pass + '/' + c.total + '</span></a>';
+    });
+    html += '</div></div></div>';
+
+    html += '<main>';
+    if(!vis.length) html += '<div class="empty">Nothing matches this filter.</div>';
+    PHASES.forEach(function(ph, n){
+      var rows = byPhase[ph.code];
+      if(!rows || !rows.length) return;
+      var c = counts(ALL.filter(function(r){ return r.ph.code === ph.code; }));
+      html += '<section class="phase" id="ph-' + ph.code + '">'
+        + '<div class="phase-head"><span class="n">' + (n+1 < 10 ? "0" : "") + (n+1) + ' · ' + ph.code + '</span>'
+        + '<h2>' + ph.name + '</h2><span class="ct">' + c.pass + '/' + c.total + '</span></div>'
+        + '<p class="phase-note">' + ph.note + '</p><div class="rows">';
+      rows.forEach(function(r){
+        var s = stateOf(r.id);
+        var label = s === 0 ? "Mark passed" : (s === 1 ? "Flag as a defect" : "Clear");
+        html += '<div class="row s' + s + '">'
+          + '<button class="tick" data-id="' + r.id + '" aria-label="' + r.id + ': ' + label + '" title="' + label + '">'
+          + (s === 2 ? CROSS : TICK) + '</button>'
+          + '<div class="what"><b>' + r.it.t + '</b><span class="expect">' + r.it.e + '</span>'
+          + '<span class="tags"><span class="id">' + r.id + '</span>'
+          + (r.it.p === 1 ? '<span class="p1">Blocker</span>' : '') + '</span></div>';
+        if(s === 2){
+          html += '<input class="note" data-note="' + r.id + '" value="' + esc(noteOf(r.id)) + '" placeholder="What went wrong?">';
+        }
+        html += '</div>';
+      });
+      html += '</div></section>';
+    });
+    html += '</main>';
+
+    html += '<footer><span>Everly White storefront — Next.js 16 · Supabase · Razorpay · Resend</span>'
+      + '<span><code>' + ALL.length + '</code> checks · <code>'
+      + ALL.filter(function(r){ return r.it.p === 1; }).length + '</code> release-blocking</span></footer>';
+
+    app.innerHTML = html;
+    idleLine();
+    wire();
+  }
+
+  /* ── interaction ───────────────────────────────────── */
+
+  function wire(){
+    var app = document.getElementById("app");
+
+    app.querySelectorAll(".tick").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var id = btn.getAttribute("data-id");
+        var next = (stateOf(id) + 1) % 3;
+        if(next === 0) delete state.items[id];
+        else state.items[id] = {s:next, n: next === 2 ? noteOf(id) : ""};
+        var y = window.scrollY;
+        render();
+        window.scrollTo(0, y);
+        save();
+      });
+    });
+
+    app.querySelectorAll("[data-note]").forEach(function(inp){
+      inp.addEventListener("input", function(){
+        var id = inp.getAttribute("data-note");
+        if(state.items[id]){ state.items[id].n = inp.value; save(); }
+      });
+    });
+
+    app.querySelectorAll("[data-meta]").forEach(function(inp){
+      inp.addEventListener("input", function(){
+        state.meta[inp.getAttribute("data-meta")] = inp.value;
+        save();
+      });
+    });
+
+    app.querySelectorAll("[data-filter]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        prefs.filter = btn.getAttribute("data-filter");
+        savePrefs(); render();
+      });
+    });
+
+    var p1 = app.querySelector("[data-p1]");
+    if(p1) p1.addEventListener("click", function(){ prefs.p1only = !prefs.p1only; savePrefs(); render(); });
+
+    var reset = document.getElementById("reset");
+    if(reset) reset.addEventListener("click", function(){
+      if(!confirm("Clear every tick and note in this run?")) return;
+      state.items = {};
+      render(); save();
+    });
+
+    var print = document.getElementById("print");
+    if(print) print.addEventListener("click", function(){ window.print(); });
+
+    var copy = document.getElementById("copy");
+    if(copy) copy.addEventListener("click", copyReport);
+  }
+
+  function strip(html){
+    var d = document.createElement("div");
+    d.innerHTML = html;
+    return (d.textContent || "").replace(/\s+/g, " ").trim();
+  }
+
+  function reportText(){
+    var all = counts(ALL);
+    var L = [];
+    L.push("EVERLY WHITE - RELEASE GATE");
+    L.push("");
+    L.push("Tested by:   " + (state.meta.tester || "-"));
+    L.push("Build:       " + (state.meta.build || "-"));
+    L.push("Environment: " + (state.meta.env || "-"));
+    L.push("Date:        " + (state.meta.date || "-"));
+    L.push("Result:      " + all.pass + " passed, " + all.fail + " failed, " + all.open + " untested (of " + all.total + ")");
+    var blockers = ALL.filter(function(r){ return r.it.p === 1 && stateOf(r.id) !== 1; });
+    L.push("Blocking checks still unproven: " + blockers.length);
+    L.push("");
+
+    var fails = ALL.filter(function(r){ return stateOf(r.id) === 2; });
+    if(fails.length){
+      L.push("DEFECTS");
+      L.push("");
+      fails.forEach(function(r){
+        L.push("- " + r.id + (r.it.p === 1 ? " (BLOCKER)" : "") + " - " + strip(r.it.t));
+        L.push("    Expected: " + strip(r.it.e));
+        if(noteOf(r.id)) L.push("    Observed: " + noteOf(r.id));
+      });
+      L.push("");
+    }
+    if(blockers.length){
+      L.push("BLOCKING CHECKS NOT YET PASSED");
+      L.push("");
+      blockers.forEach(function(r){
+        L.push("- " + r.id + " - " + strip(r.it.t) + (stateOf(r.id) === 2 ? " (failed)" : " (untested)"));
+      });
+      L.push("");
+    }
+    L.push("FULL RUN");
+    L.push("");
+    PHASES.forEach(function(ph, n){
+      L.push((n+1) + ". " + ph.name + " (" + ph.code + ")");
+      ph.items.forEach(function(it){
+        var id = idOf(ph, it), s = stateOf(id);
+        L.push("  [" + (s === 1 ? "x" : (s === 2 ? "!" : " ")) + "] " + id + " - " + strip(it.t));
+      });
+      L.push("");
+    });
+    return L.join("\n");
+  }
+
+  function copyReport(){
+    var btn = document.getElementById("copy");
+    var text = reportText();
+    function done(ok){
+      btn.textContent = ok ? "Copied" : "Press Ctrl+C";
+      setTimeout(function(){ btn.textContent = "Copy report"; }, 2200);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ fallback(text, done); });
+    } else {
+      fallback(text, done);
+    }
+  }
+
+  function fallback(text, done){
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try{ ok = document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    done(ok);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

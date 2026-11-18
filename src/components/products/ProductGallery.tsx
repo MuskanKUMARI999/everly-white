@@ -37,6 +37,9 @@ function MediaFrame({
           ref={videoRef}
           src={item.src}
           poster={item.poster}
+          // A <video> has no alt attribute, so without this a real clip reached screen readers as
+          // an unnamed element — the description admin wrote for it had nowhere to land.
+          aria-label={item.alt}
           muted
           loop
           playsInline

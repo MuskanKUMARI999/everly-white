@@ -11,11 +11,12 @@ import { Button } from "@/components/ui/Button";
 import { inputClasses } from "@/components/ui/inputStyles";
 import { subscribeToNewsletter } from "@/lib/newsletter/actions";
 import { WELCOME_CODE } from "@/lib/newsletter/welcomeOffer";
+import { INDIA_PHONE_DIGITS } from "@/components/ui/countryCodes";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const STORAGE_KEY = "ew-welcome-popup-last-shown";
 const SHOW_AGAIN_AFTER_MS = 24 * 60 * 60 * 1000;
-const OPEN_DELAY_MS = 900;
+const OPEN_DELAY_MS = 8000;
 
 export function WelcomePopup() {
   const pathname = usePathname();
@@ -31,7 +32,7 @@ export function WelcomePopup() {
 
   // Depends on `suppressed`, not [] — this component is mounted once by the root layout and
   // survives every client-side navigation, so with an empty dep list a timer armed on the homepage
-  // would still fire 900ms later on /checkout, and landing directly on /checkout armed it there.
+  // would still fire 8s later on /checkout, and landing directly on /checkout armed it there.
   // Re-running only when `suppressed` flips keeps browse-to-browse navigation from re-arming it.
   useEffect(() => {
     // No timer is armed on a suppressed route. Nothing needs closing here either: the render below
@@ -72,6 +73,12 @@ export function WelcomePopup() {
     }
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) {
       setError("Please enter a valid email address.");
+      return;
+    }
+
+    // Phone is optional here, but a partly typed one is a mistake worth catching.
+    if (phone && phone.length !== INDIA_PHONE_DIGITS) {
+      setError(`Please enter a valid ${INDIA_PHONE_DIGITS}-digit phone number.`);
       return;
     }
 
@@ -192,7 +199,7 @@ export function WelcomePopup() {
                     <input
                       type="tel"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, INDIA_PHONE_DIGITS))}
                       placeholder="Phone"
                       aria-label="Phone"
                       inputMode="numeric"

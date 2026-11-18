@@ -55,10 +55,11 @@ async function seed() {
         description: centerOfTheUniverse.intro.paragraphs.join("\n\n"),
         category_id: centerPiecesId,
         hero_image: centerOfTheUniverse.heroImage,
+        // No founderNote: the collection page has no founder band. The founder's story is edited
+        // on Admin → About Us, which is the only page that shows one.
         metadata: {
           intro: centerOfTheUniverse.intro,
           stats: centerOfTheUniverse.stats,
-          founderNote: centerOfTheUniverse.founderNote,
         },
       },
       { onConflict: "slug", ignoreDuplicates: false },

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { safeRedirectPath } from "@/lib/auth/safeRedirect";
+import { siteUrl } from "@/lib/site";
 
 // Next 16 deprecated the `middleware` file convention and renamed it to `proxy` (same API, but it
 // now defaults to the Node.js runtime instead of Edge). This file must sit beside `app/` — i.e.
@@ -52,7 +53,7 @@ export async function proxy(request: NextRequest) {
   if (isProtected(pathname) && !user) {
     // Carry the page they were actually trying to reach, so signing in resumes it instead of
     // dumping them on the homepage. Query string included — /account/orders?x=1 must survive too.
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/login", siteUrl());
     loginUrl.searchParams.set("next", pathname + request.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
@@ -64,7 +65,8 @@ export async function proxy(request: NextRequest) {
     const destination = isAuthRoute(new URL(requested, request.url).pathname)
       ? "/account"
       : requested;
-    return NextResponse.redirect(new URL(destination, request.url));
+    // Public origin, not request.url — behind the host's proxy that is https://0.0.0.0:3000.
+    return NextResponse.redirect(new URL(destination, siteUrl()));
   }
 
   return response;

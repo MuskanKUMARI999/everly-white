@@ -18,13 +18,27 @@ import {
   Waypoints,
   Link2,
   Sparkles,
+  ChevronRight,
+  Layers,
+  Infinity as InfinityIcon,
+  Archive,
+  FileText,
+  CircleHelp,
+  Gift,
+  LogOut,
   type LucideIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { useCart } from "@/components/cart/CartContext";
+import { useHideOnScroll } from "@/hooks/useHideOnScroll";
 import { signOut } from "@/lib/auth/actions";
 import type { NavCollectionData } from "@/lib/data/navigation";
-import { isAdminRoute, isCheckoutFlowRoute, isMinimalChromeRoute } from "./chromeRoutes";
+import {
+  isAdminRoute,
+  isCheckoutFlowRoute,
+  isMinimalChromeRoute,
+  isProductDetailRoute,
+} from "./chromeRoutes";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 const navLinks = [
@@ -40,6 +54,76 @@ const navLinks = [
 // Decorative icons rotate across a collection's products in order — the products themselves carry
 // no icon in the database, so this is purely presentational.
 const ITEM_ICONS: LucideIcon[] = [Flame, Moon, Star, Waypoints, Link2, Sparkles];
+
+type IconProps = { size?: number; strokeWidth?: number; className?: string };
+
+// Lucide has no butterfly or lotus, so these two are drawn inline in the same 24px stroke style.
+function ButterflyIcon({ size = 24, strokeWidth = 2, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 8v11" />
+      <path d="M12 8 10.5 5M12 8l1.5-3" />
+      <path d="M12 11C10 6 4.5 3.5 3 5.5c-1.5 2 .5 6.5 9 7" />
+      <path d="M12 11c2-5 7.5-7.5 9-5.5 1.5 2-.5 6.5-9 7" />
+      <path d="M12 13c-4 .5-7 2.5-6 5s4.5 1.5 6-3" />
+      <path d="M12 13c4 .5 7 2.5 6 5s-4.5 1.5-6-3" />
+    </svg>
+  );
+}
+
+function LotusIcon({ size = 24, strokeWidth = 2, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M12 20c-2.5-1.8-3.5-4.5-3.5-7.5S10 6.5 12 4c2 2.5 3.5 5.5 3.5 8.5S14.5 18.2 12 20Z" />
+      <path d="M12 20c-3.5 0-7-2.5-7-8 1.8.2 3.2.9 4.2 1.9" />
+      <path d="M12 20c3.5 0 7-2.5 7-8-1.8.2-3.2.9-4.2 1.9" />
+      <path d="M12 20c-4.5.3-8.5-1.2-10-4.5 1.6-.6 3.3-.6 4.8-.1" />
+      <path d="M12 20c4.5.3 8.5-1.2 10-4.5-1.6-.6-3.3-.6-4.8-.1" />
+    </svg>
+  );
+}
+
+// The mobile drawer follows its own mock: flame, moon, star, butterfly, infinity.
+const MOBILE_ITEM_ICONS: ComponentType<IconProps>[] = [
+  Flame,
+  Moon,
+  Star,
+  ButterflyIcon,
+  InfinityIcon,
+  Sparkles,
+];
+
+// Home is left out of the drawer: the logo directly below it already links home.
+const mobileNavLinks: { label: string; href: string; icon: ComponentType<IconProps> }[] = [
+  { label: "About Us", href: "/about", icon: User },
+  { label: "Products", href: "/products", icon: Archive },
+  { label: "Blogs", href: "/blog", icon: FileText },
+  { label: "Reviews", href: "/reviews", icon: Star },
+  { label: "FAQ", href: "/faqs", icon: CircleHelp },
+  { label: "Gifts", href: "/gifts", icon: Gift },
+];
 
 // Upcoming collections aren't published in the database yet, so they can't come from getNavCollections.
 // Kept here as a teaser tab appended after the live collections, preserving the "coming soon" preview.
@@ -96,6 +180,7 @@ export function Header({
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [mobileCollectionsOpen, setMobileCollectionsOpen] = useState(true);
 
   // Live collections first, then the coming-soon teasers.
   const allCollections = [...collections, ...UPCOMING_COLLECTIONS];
@@ -112,6 +197,11 @@ export function Header({
   // Admin renders no storefront chrome at all — not even the minimal logo bar, since AdminShell
   // brings its own header. Checked before the minimal branch so it can't fall through to it.
   const isAdmin = isAdminRoute(pathname);
+
+  // Product pages only: the bar slides away on scroll-down and comes back the moment the reader
+  // scrolls up. Suspended while the search or mobile-menu panel is open — both live inside the
+  // header, so hiding it would yank the panel the reader is using off the screen.
+  const hidden = useHideOnScroll(isProductDetailRoute(pathname) && !menuOpen && !searchOpen);
 
   function handleSearch(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -155,6 +245,38 @@ export function Header({
     );
   }
 
+  // Rendered in two places, and never both at once — the hidden one is display:none, so it stays
+  // out of the accessibility tree rather than duplicating the control. On phones the drawer
+  // toggle sits at the LEFT edge of the bar; from md up it stays in the right-hand icon cluster.
+  // The caller supplies the position utility: Tailwind orders .relative after .absolute, so a
+  // base `relative` here would silently win over an `absolute` passed in through className.
+  const menuToggle = (className: string, withLabel = false) => (
+    <button
+      type="button"
+      aria-label="Toggle menu"
+      onClick={() => setMenuOpen((o) => !o)}
+      className={`cursor-pointer -m-2.5 h-10 w-10 items-center justify-center text-neutral-400 transition-colors hover:text-brown ${className}`}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={menuOpen ? "close" : "open"}
+          initial={{ rotate: -90, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          exit={{ rotate: 90, opacity: 0 }}
+          transition={{ duration: 0.2, ease: EASE }}
+          className="absolute flex"
+        >
+          {menuOpen ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
+        </motion.span>
+      </AnimatePresence>
+      {withLabel && (
+        <span className="absolute left-1/2 top-full -mt-1 -translate-x-1/2 font-heading text-[9px] uppercase tracking-[0.18em] text-brown">
+          Menu
+        </span>
+      )}
+    </button>
+  );
+
   return (
     <>
       <div className="border-b border-neutral-100 bg-beige-light px-4 py-2.5 text-center">
@@ -167,8 +289,18 @@ export function Header({
         </p>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-white/40 bg-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.06)] backdrop-blur-lg">
-        <div className="relative mx-auto flex max-w-content items-center justify-center px-6 pt-3 sm:px-10 lg:px-10">
+      <header
+        className={`sticky top-0 z-40 border-b border-white/40 bg-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.06)] backdrop-blur-lg transition-transform duration-300 ease-out motion-reduce:transition-none ${
+          hidden ? "-translate-y-full" : "translate-y-0"
+        }`}
+      >
+        {/* pt-0 below md lifts the logo up level with the icons: this row is empty on phones
+            (the nav is lg-only and both icon clusters are absolute), so its padding is doing
+            nothing but pushing the logo row down. The icons are positioned from this element's
+            border-box top, so they stay put. md and up keeps the original spacing. */}
+        <div className="relative mx-auto flex max-w-content items-center justify-center px-6 pt-0 sm:px-10 md:pt-3 lg:px-10">
+          {menuToggle("absolute left-6 top-2.5 flex sm:left-10 md:hidden", true)}
+
           <nav className="hidden items-center gap-6 lg:flex">
             {[navLinks[0]].map((link) => (
               <NavLink key={link.href} {...link} active={isActive(link.href)} />
@@ -179,12 +311,14 @@ export function Header({
               onMouseEnter={() => setCollectionOpen(true)}
               onMouseLeave={() => setCollectionOpen(false)}
             >
-              <button
-                type="button"
+              {/* Hover opens the dropdown; a click goes straight to the collection page. */}
+              <Link
+                href={collections[0]?.href ?? "/collection"}
                 aria-expanded={collectionOpen}
                 aria-haspopup="menu"
                 aria-current={collectionActive ? "page" : undefined}
-                onClick={() => setCollectionOpen((o) => !o)}
+                onClick={() => setCollectionOpen(false)}
+                onFocus={() => setCollectionOpen(true)}
                 className={`cursor-pointer relative flex items-center gap-1 pb-1.5 font-heading text-[11.5px] uppercase tracking-widest transition-colors hover:text-brown ${
                   collectionActive ? "font-semibold text-brown" : "font-medium text-neutral-400"
                 }`}
@@ -204,7 +338,7 @@ export function Header({
                     transition={{ type: "spring", stiffness: 420, damping: 34 }}
                   />
                 )}
-              </button>
+              </Link>
               <AnimatePresence>
                 {collectionOpen && (
                   <motion.div
@@ -343,8 +477,11 @@ export function Header({
           </nav>
 
           <div className="absolute right-6 top-2.5 flex items-center gap-4 sm:right-10 lg:right-10">
+            {/* Account actions move into the hamburger drawer below md — see the drawer
+                below. On a phone the top bar cannot fit the account icon plus the Logout
+                label alongside search, cart and the menu button without crowding the logo. */}
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="hidden items-center gap-4 md:flex">
                 <Link
                   href="/account"
                   aria-label="Account"
@@ -366,7 +503,7 @@ export function Header({
               <Link
                 href="/login"
                 aria-label="Sign in"
-                className="-m-2.5 p-2.5 text-neutral-400 transition-colors hover:text-brown"
+                className="hidden -m-2.5 p-2.5 text-neutral-400 transition-colors hover:text-brown md:block"
               >
                 <User size={17} strokeWidth={1.4} />
               </Link>
@@ -394,25 +531,7 @@ export function Header({
                 )}
               </span>
             </Link>
-            <button
-              type="button"
-              aria-label="Toggle menu"
-              onClick={() => setMenuOpen((o) => !o)}
-              className="cursor-pointer relative -m-2.5 flex h-10 w-10 items-center justify-center text-neutral-400 transition-colors hover:text-brown lg:hidden"
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={menuOpen ? "close" : "open"}
-                  initial={{ rotate: -90, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  exit={{ rotate: 90, opacity: 0 }}
-                  transition={{ duration: 0.2, ease: EASE }}
-                  className="absolute flex"
-                >
-                  {menuOpen ? <X size={20} strokeWidth={1.4} /> : <Menu size={20} strokeWidth={1.4} />}
-                </motion.span>
-              </AnimatePresence>
-            </button>
+            {menuToggle("relative hidden md:flex lg:hidden")}
           </div>
         </div>
 
@@ -457,54 +576,182 @@ export function Header({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25, ease: EASE }}
-              className="overflow-hidden border-t border-neutral-100 bg-white/95 lg:hidden"
+              className="overflow-hidden bg-beige-light pt-16 md:pt-0 lg:hidden"
             >
-              <nav className="flex flex-col gap-1 px-6 py-4">
-                {navLinks.map((link, i) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.22, delay: i * 0.035, ease: EASE }}
+              {/* The header is sticky, so a drawer taller than the screen could never be scrolled
+                  into view — the drawer scrolls internally instead. */}
+              <nav className="max-h-[calc(100dvh-7rem)] overflow-y-auto px-6 pb-4 sm:px-10">
+                <div className="border-t border-neutral-100">
+                  <button
+                    type="button"
+                    aria-expanded={mobileCollectionsOpen}
+                    onClick={() => setMobileCollectionsOpen((o) => !o)}
+                    className={`flex w-full cursor-pointer items-center gap-4 py-4 font-heading text-[15px] uppercase tracking-[0.12em] transition-colors hover:text-brown ${
+                      collectionActive ? "text-brown" : "text-neutral-500"
+                    }`}
                   >
-                    <Link
-                      href={link.href}
-                      onClick={() => setMenuOpen(false)}
-                      aria-current={isActive(link.href) ? "page" : undefined}
-                      className={`block py-2 font-heading text-xs uppercase tracking-widest transition-colors hover:text-brown ${
-                        isActive(link.href) ? "font-semibold text-brown" : "font-medium text-neutral-400"
-                      }`}
+                    <Layers size={20} strokeWidth={1.3} className="shrink-0 text-brown" />
+                    <span className="flex-1 text-left">Collections</span>
+                    <motion.span
+                      animate={{ rotate: mobileCollectionsOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2, ease: EASE }}
+                      className="flex text-neutral-300"
                     >
-                      {link.label}
-                    </Link>
-                    {i === 0 && (
-                      <div className="border-t border-neutral-100 py-2 pl-4">
-                        {allCollections.map((c) => (
-                          <div key={c.key} className="mb-3 last:mb-0">
-                            <p className="font-heading text-xs uppercase tracking-[0.14em] text-neutral-300">
-                              {c.name}
-                              {c.badge && <span> ({c.badge})</span>}
-                            </p>
-                            {c.items.length > 0 ? (
-                              c.items.map((item) => (
-                                <Link
-                                  key={item.href}
-                                  href={item.href}
-                                  onClick={() => setMenuOpen(false)}
-                                  className="block py-1.5 font-heading text-xs uppercase tracking-widest text-neutral-400 transition-colors hover:text-brown"
-                                >
-                                  {item.label}
-                                </Link>
-                              ))
-                            ) : (
-                              <p className="py-1.5 font-body text-xs text-neutral-300">Coming soon.</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                      <ChevronDown size={16} strokeWidth={1.4} />
+                    </motion.span>
+                  </button>
+
+                  <AnimatePresence initial={false}>
+                    {mobileCollectionsOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: EASE }}
+                        className="overflow-hidden"
+                      >
+                        {allCollections.map((c, ci) =>
+                          c.items.length > 0 ? (
+                            <div key={c.key} className="mb-2">
+                              <Link
+                                href={c.href}
+                                onClick={() => setMenuOpen(false)}
+                                className="group/card relative block h-37 overflow-hidden rounded-sm border border-neutral-100/70 bg-beige-light"
+                              >
+                                <Image
+                                  src={c.image}
+                                  alt={c.imageAlt}
+                                  fill
+                                  sizes="(min-width: 768px) 60vw, 90vw"
+                                  className="object-cover object-right transition-transform duration-500 group-hover/card:scale-[1.03]"
+                                />
+                                <div className="absolute inset-0 bg-linear-to-r from-beige-light from-30% via-beige-light/80 to-transparent" />
+                                <div className="relative flex h-full max-w-[72%] flex-col justify-center px-5">
+                                  <p className="text-balance font-heading text-[18px] uppercase leading-tight tracking-[0.04em] text-neutral-500">
+                                    {c.name}
+                                  </p>
+                                  <p className="mt-3 inline-flex items-center gap-2 whitespace-nowrap font-body text-[13.5px] text-neutral-400">
+                                    {ci === 0 ? "Explore the debut collection" : "Explore the collection"}
+                                    <ArrowRight size={14} strokeWidth={1.4} className="shrink-0 text-brown" />
+                                  </p>
+                                </div>
+                              </Link>
+
+                              <ul>
+                                {c.items.map((item, index) => {
+                                  const Icon = MOBILE_ITEM_ICONS[index % MOBILE_ITEM_ICONS.length];
+                                  const active = pathname === item.href;
+                                  return (
+                                    <li key={item.href} className="border-b border-neutral-100/70 last:border-b-0">
+                                      <Link
+                                        href={item.href}
+                                        onClick={() => setMenuOpen(false)}
+                                        aria-current={active ? "page" : undefined}
+                                        className={`flex items-center gap-4 py-4 pl-2 font-heading text-[13px] uppercase tracking-[0.15em] transition-colors hover:text-brown ${
+                                          active ? "font-semibold text-brown" : "text-neutral-500"
+                                        }`}
+                                      >
+                                        <Icon size={20} strokeWidth={1.3} className="w-10 shrink-0 text-brown" />
+                                        <span className="flex-1">{item.label}</span>
+                                        <ChevronRight size={16} strokeWidth={1.4} className="text-neutral-300" />
+                                      </Link>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          ) : (
+                            // Upcoming collections have nothing to link to yet, so they render as
+                            // a muted, non-interactive teaser row.
+                            <div
+                              key={c.key}
+                              aria-disabled="true"
+                              className="flex items-center gap-4 border-t border-neutral-100/70 py-4 pl-2"
+                            >
+                              <LotusIcon size={22} strokeWidth={1.2} className="w-10 shrink-0 text-neutral-200" />
+                              <div className="flex-1">
+                                <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-heading text-[13px] uppercase tracking-[0.12em] text-neutral-500">
+                                  {c.name}
+                                  {c.badge && (
+                                    <span className="whitespace-nowrap rounded-sm border border-neutral-200 px-1.5 py-0.5 text-[8.5px] tracking-[0.08em] text-neutral-300">
+                                      {c.badge}
+                                    </span>
+                                  )}
+                                </p>
+                                <p className="mt-1 font-body text-[14px] text-neutral-200">
+                                  A new collection is on its way.
+                                </p>
+                              </div>
+                              <ChevronRight size={16} strokeWidth={1.4} className="text-neutral-200" />
+                            </div>
+                          ),
+                        )}
+                      </motion.div>
                     )}
-                  </motion.div>
-                ))}
+                  </AnimatePresence>
+                </div>
+
+                <ul className="mt-3 border-t border-neutral-100 pt-2">
+                  {mobileNavLinks.map(({ label, href, icon: Icon }, i) => (
+                    <motion.li
+                      key={href}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.22, delay: i * 0.035, ease: EASE }}
+                    >
+                      <Link
+                        href={href}
+                        onClick={() => setMenuOpen(false)}
+                        aria-current={isActive(href) ? "page" : undefined}
+                        className={`flex items-center gap-5 py-3.5 font-heading text-[13px] uppercase tracking-[0.16em] transition-colors hover:text-brown ${
+                          isActive(href) ? "font-semibold text-brown" : "text-neutral-500"
+                        }`}
+                      >
+                        <Icon size={20} strokeWidth={1.3} className="shrink-0 text-brown" />
+                        <span className="flex-1">{label}</span>
+                        <ChevronRight size={16} strokeWidth={1.4} className="text-neutral-300" />
+                      </Link>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                {/* md:hidden — at md and up these still live in the top bar. */}
+                <div className="mt-3 border-t border-neutral-100 pt-2 md:hidden">
+                  {user ? (
+                    <>
+                      <Link
+                        href="/account"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-5 py-3.5 font-heading text-[13px] uppercase tracking-[0.16em] text-neutral-500 transition-colors hover:text-brown"
+                      >
+                        <User size={20} strokeWidth={1.3} className="shrink-0 text-neutral-400" />
+                        <span className="flex-1">My Account</span>
+                        <ChevronRight size={16} strokeWidth={1.4} className="text-neutral-300" />
+                      </Link>
+                      <form action={signOut}>
+                        <button
+                          type="submit"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex w-full cursor-pointer items-center gap-5 py-3.5 text-left font-heading text-[13px] uppercase tracking-[0.16em] text-neutral-500 transition-colors hover:text-brown"
+                        >
+                          <LogOut size={20} strokeWidth={1.3} className="shrink-0 text-neutral-400" />
+                          <span className="flex-1">Logout</span>
+                          <ChevronRight size={16} strokeWidth={1.4} className="text-neutral-300" />
+                        </button>
+                      </form>
+                    </>
+                  ) : (
+                    <Link
+                      href="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-5 py-3.5 font-heading text-[13px] uppercase tracking-[0.16em] text-neutral-500 transition-colors hover:text-brown"
+                    >
+                      <User size={20} strokeWidth={1.3} className="shrink-0 text-neutral-400" />
+                      <span className="flex-1">Sign In</span>
+                      <ChevronRight size={16} strokeWidth={1.4} className="text-neutral-300" />
+                    </Link>
+                  )}
+                </div>
               </nav>
             </motion.div>
           )}
@@ -523,7 +770,9 @@ export function Header({
               // bandwidth on first paint. Only one of the two logos below ever renders per
               // request, since the minimal header returns early.
               fetchPriority="high"
-              className="h-auto w-37.5 sm:w-45"
+              // w-32 under 360px: the logo now sits level with the icons, and at 320px the
+              // 150px version comes within ~11px of the search icon.
+              className="h-auto w-32 min-[360px]:w-37.5 sm:w-45"
             />
           </Link>
         </div>

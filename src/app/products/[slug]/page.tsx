@@ -57,9 +57,9 @@ function imageExists(src: string) {
   return exists;
 }
 
-// Placeholder assets standing in until real per-product photography/video is shot.
-// Target set per product is 6 images + 2 videos — swap these out (or add a `src` to the
-// video entries once clips exist) without touching the gallery component itself.
+// Placeholder assets standing in until real per-product photography/video is shot. They only ever
+// top up what a product is short of: whatever admin uploaded leads the gallery, in the order it was
+// arranged in, and the fillers queue behind it. Target set per product is 6 images + 2 videos.
 const FILLER_IMAGES: { src: string; alt: string }[] = [
   { src: "/images/instagram/lifestyle-sofa.jpg", alt: "Everly White plates styled on a living room coffee table" },
   { src: "/images/instagram/product-marble-counter.jpg", alt: "Everly White plates styled on a marble countertop" },
@@ -84,10 +84,12 @@ export default async function ProductPage({
 
   const collection = await getCollectionBySlug(product.collectionSlug);
 
-  const ownPhotos: ProductMediaItem[] = product.galleryImages
-    ? product.galleryImages
-        .filter((photo) => imageExists(photo.src))
-        .map((photo) => ({ type: "image" as const, src: photo.src, alt: photo.alt }))
+  // Photos and videos already arrive interleaved in the order admin arranged them, so this is the
+  // gallery's real sequence — a clip in slot 1 opens the page on a clip.
+  const ownMedia: ProductMediaItem[] = product.galleryMedia?.length
+    ? product.galleryMedia
+        .filter((item) => item.type === "video" || imageExists(item.src))
+        .map((item) => ({ type: item.type, src: item.src, alt: item.alt }))
     : [
         { type: "image", src: product.image, alt: product.name },
         ...(product.hoverImage && imageExists(product.hoverImage)
@@ -95,25 +97,27 @@ export default async function ProductPage({
           : []),
       ];
 
-  const fillerPhotos: ProductMediaItem[] = FILLER_IMAGES.slice(0, 6 - ownPhotos.length).map((f) => ({
+  const ownPhotoCount = ownMedia.filter((item) => item.type === "image").length;
+  const fillerPhotos: ProductMediaItem[] = FILLER_IMAGES.slice(
+    0,
+    Math.max(0, 6 - ownPhotoCount),
+  ).map((f) => ({
     type: "image",
     src: f.src,
     alt: f.alt,
   }));
 
-  const videoSlots: ProductMediaItem[] = product.videos?.length
-    ? product.videos.map((src, i) => ({
-        type: "video" as const,
-        src,
-        alt: `${product.name} video ${i + 1}`,
-      }))
+  // Suppressed entirely once the product has a clip of its own — a real video followed by two
+  // "coming soon" cards reads as a broken gallery rather than a promise.
+  const videoSlots: ProductMediaItem[] = ownMedia.some((item) => item.type === "video")
+    ? []
     : VIDEO_PLACEHOLDERS.map((v) => ({
         type: "video",
         alt: v.alt,
         poster: v.poster,
       }));
 
-  const galleryMedia: ProductMediaItem[] = [...ownPhotos, ...fillerPhotos, ...videoSlots];
+  const galleryMedia: ProductMediaItem[] = [...ownMedia, ...fillerPhotos, ...videoSlots];
 
   const allProducts = await getAllProducts();
   const related = allProducts.filter((item) => item.name !== product.name).slice(0, 4);

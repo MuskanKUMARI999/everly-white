@@ -18,6 +18,21 @@ export type UploadOutcome = {
 };
 
 /**
+ * Reported once as each file starts and once as it settles. A plain done/total counter could only
+ * drive a number on a button; the pickers show a per-file state, so they need to know which file
+ * an event is about.
+ */
+export type UploadProgress = {
+  file: File;
+  index: number;
+  total: number;
+  /** Files settled so far, successfully or not. */
+  done: number;
+  phase: "start" | "done" | "error";
+  message?: string;
+};
+
+/**
  * Storage folder for media chosen before its product row exists. The server only accepts a UUID
  * here, so the fallback has to produce the same shape — `crypto.randomUUID` needs a secure context
  * and is absent over plain HTTP, which would otherwise throw mid-upload rather than degrade.
@@ -37,19 +52,25 @@ export async function uploadFiles(
   bucket: MediaBucket,
   folder: string,
   files: File[],
-  onProgress?: (done: number, total: number) => void,
+  onProgress?: (progress: UploadProgress) => void,
 ): Promise<UploadOutcome> {
   const supabase = createClient();
   const uploaded: UploadedMedia[] = [];
   const errors: string[] = [];
   let done = 0;
 
-  for (const file of files) {
+  for (const [index, file] of files.entries()) {
+    const report = (phase: UploadProgress["phase"], message?: string) =>
+      onProgress?.({ file, index, total: files.length, done, phase, message });
+
+    report("start");
+
     // Fail obvious cases before spending a round trip on them; the server checks again anyway.
     const localProblem = checkFileAgainstRules(bucket, file);
     if (localProblem) {
       errors.push(localProblem);
-      onProgress?.(++done, files.length);
+      done++;
+      report("error", localProblem);
       continue;
     }
 
@@ -63,7 +84,8 @@ export async function uploadFiles(
 
     if (!signed.success) {
       errors.push(`"${file.name}": ${signed.message}`);
-      onProgress?.(++done, files.length);
+      done++;
+      report("error", signed.message);
       continue;
     }
 
@@ -71,13 +93,14 @@ export async function uploadFiles(
       .from(bucket)
       .uploadToSignedUrl(signed.path, signed.token, file, { contentType: file.type });
 
+    done++;
     if (error) {
       errors.push(`"${file.name}": ${error.message}`);
+      report("error", error.message);
     } else {
       uploaded.push({ path: signed.path, alt: file.name.replace(/\.[^.]+$/, "") });
+      report("done");
     }
-
-    onProgress?.(++done, files.length);
   }
 
   return { uploaded, errors };

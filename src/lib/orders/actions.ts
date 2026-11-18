@@ -51,6 +51,8 @@ export async function trackOrder(
     const { data: userData } = await supabase.auth.admin.getUserById(order.user_id);
     orderEmail = userData.user?.email?.toLowerCase() ?? null;
   }
+  // The customer has since deleted their account; the address they had is kept on the order.
+  orderEmail ??= order.former_account_email?.toLowerCase() ?? null;
 
   if (!orderEmail || orderEmail !== email) return notFound;
 

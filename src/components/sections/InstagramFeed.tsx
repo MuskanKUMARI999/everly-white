@@ -1,30 +1,30 @@
 import Image from "next/image";
 import { FaInstagram } from "react-icons/fa6";
 import { Reveal } from "@/components/ui/Reveal";
+import { list, text, type SectionValues } from "@/lib/content/sections";
 
-const INSTAGRAM_URL = "https://www.instagram.com/everlywhitestudios/";
+function Tile({
+  src,
+  alt,
+  href,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  /** Blank when the profile URL has been cleared in admin — the tile then stops being a link. */
+  href: string;
+  className?: string;
+}) {
+  // An empty href is not a harmless no-op: it resolves to the current page, so clicking a tile
+  // would silently reload the homepage.
+  const Wrapper = href ? "a" : "div";
+  const linkProps = href
+    ? ({ href, target: "_blank", rel: "noopener noreferrer" } as const)
+    : {};
 
-const leftColumn = [
-  { src: "/images/instagram/craft-process.jpg", alt: "Hand-setting mirror work on an Everly White plate" },
-  { src: "/images/instagram/lifestyle-sofa.jpg", alt: "Everly White plates styled on a living room coffee table" },
-];
-
-const rightColumn = [
-  { src: "/images/instagram/product-coffee-table.jpg", alt: "Everly White plates on a coffee table with candles" },
-  { src: "/images/instagram/product-marble-counter.jpg", alt: "Everly White plates on a marble countertop" },
-];
-
-const center = {
-  src: "/images/instagram/product-display.jpg",
-  alt: "Everly White plates displayed on gold stands",
-};
-
-function Tile({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
   return (
-    <a
-      href={INSTAGRAM_URL}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Wrapper
+      {...linkProps}
       className={`group relative aspect-square overflow-hidden ${className}`}
     >
       <Image
@@ -40,48 +40,64 @@ function Tile({ src, alt, className = "" }: { src: string; alt: string; classNam
           className="text-white opacity-0 transition-opacity group-hover:opacity-100"
         />
       </div>
-    </a>
+    </Wrapper>
   );
 }
 
-export function InstagramFeed() {
+export function InstagramFeed({ content }: { content: SectionValues }) {
+  const profileUrl = text(content, "profileUrl");
+  const tiles = list(content, "tiles").filter((tile) => tile.src);
+  if (tiles.length === 0) return null;
+
+  // The desktop layout is two columns flanking one taller tile, so the middle of the list is the
+  // feature. Deriving it from the length keeps that intact however many tiles the client adds,
+  // and the mobile grid just renders the list in order — which is the same reading order.
+  const centerIndex = Math.floor(tiles.length / 2);
+  const leftColumn = tiles.slice(0, centerIndex);
+  const center = tiles[centerIndex];
+  const rightColumn = tiles.slice(centerIndex + 1);
+
   return (
     <section className="py-16 sm:py-20">
       <div className="mx-auto max-w-content px-6 sm:px-10 lg:px-10">
         <Reveal>
           <h2 className="text-center font-heading text-3xl text-neutral-500 sm:text-4xl">
-            Join our Instagram community
+            {text(content, "heading")}
           </h2>
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 block text-center font-body text-brown hover:underline"
-          >
-            @everlywhitestudios
-          </a>
+          {profileUrl ? (
+            <a
+              href={profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 block text-center font-body text-brown hover:underline"
+            >
+              {text(content, "handle")}
+            </a>
+          ) : (
+            <p className="mt-3 block text-center font-body text-brown">{text(content, "handle")}</p>
+          )}
         </Reveal>
 
         {/* Mobile: 2-col grid with larger tap targets */}
         <div className="mt-10 grid grid-cols-2 gap-3 sm:hidden">
-          {[...leftColumn, center, ...rightColumn].map((img) => (
-            <Tile key={img.src} {...img} />
+          {tiles.map((tile, i) => (
+            <Tile key={`${i}-${tile.src}`} src={tile.src} alt={tile.alt} href={profileUrl} />
           ))}
         </div>
 
         {/* sm+: 3-col layout with a taller centered feature tile */}
         <div className="mt-10 hidden grid-cols-3 gap-6 sm:grid">
           <div className="flex flex-col gap-6">
-            {leftColumn.map((img) => (
-              <Tile key={img.src} {...img} />
+            {leftColumn.map((tile, i) => (
+              <Tile key={`${i}-${tile.src}`} src={tile.src} alt={tile.alt} href={profileUrl} />
             ))}
           </div>
 
-          <Tile {...center} className="self-center" />
+          <Tile src={center.src} alt={center.alt} href={profileUrl} className="self-center" />
 
           <div className="flex flex-col gap-6">
-            {rightColumn.map((img) => (
-              <Tile key={img.src} {...img} />
+            {rightColumn.map((tile, i) => (
+              <Tile key={`${i}-${tile.src}`} src={tile.src} alt={tile.alt} href={profileUrl} />
             ))}
           </div>
         </div>

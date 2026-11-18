@@ -3,7 +3,10 @@
 import { useRef, useState } from "react";
 import Image from "next/image";
 import { uploadSingleFile } from "@/lib/admin/uploadClient";
+import { formatBytes } from "@/lib/admin/mediaTypes";
 import {
+  Check,
+  Loader2,
   Upload,
   X,
   Trash2,
@@ -124,6 +127,9 @@ function ImageBlockField({
   onChange: (patch: Partial<Extract<Block, { type: "image" }>>) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  // Same reason as the site-image field: without the filename on screen, choosing a file and
+  // choosing nothing look identical until the upload happens to finish.
+  const [picked, setPicked] = useState<{ name: string; size: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -134,10 +140,12 @@ function ImageBlockField({
 
     setUploading(true);
     setError(null);
+    setPicked({ name: file.name, size: file.size });
 
     const result = await uploadSingleFile("site-images", "blog", file);
     if ("error" in result) {
       setError(result.error);
+      setPicked(null);
     } else {
       onChange({ src: result.url });
     }
@@ -174,13 +182,34 @@ function ImageBlockField({
           className="hidden"
         />
       </div>
+      {picked && (
+        <p
+          className={`flex items-center gap-2 font-body text-sm ${
+            uploading ? "text-brown" : "text-green-600"
+          }`}
+        >
+          {uploading ? (
+            <Loader2 size={14} strokeWidth={1.8} className="animate-spin" />
+          ) : (
+            <Check size={14} strokeWidth={2} />
+          )}
+          <span className="truncate" title={picked.name}>
+            {picked.name}
+          </span>
+          <span className="shrink-0 text-neutral-400">{formatBytes(picked.size)}</span>
+          <span className="shrink-0">{uploading ? "uploading…" : "uploaded"}</span>
+        </p>
+      )}
       {error && <p className="font-body text-sm text-terracotta">{error}</p>}
       {block.src && (
         <div className="relative h-40 w-full max-w-md overflow-hidden border border-neutral-100 bg-pink-100/30">
           <Image src={block.src} alt="" fill className="object-cover" sizes="448px" />
           <button
             type="button"
-            onClick={() => onChange({ src: "" })}
+            onClick={() => {
+              onChange({ src: "" });
+              setPicked(null);
+            }}
             className="cursor-pointer absolute right-1 top-1 flex h-6 w-6 items-center justify-center bg-white/80 text-terracotta backdrop-blur-sm transition-colors hover:bg-white"
             title="Clear image"
           >

@@ -234,6 +234,7 @@ export interface Database {
           id: string;
           product_id: string;
           url: string;
+          alt: string | null;
           position: number;
           created_at: string;
         };
@@ -241,6 +242,7 @@ export interface Database {
           id?: string;
           product_id: string;
           url: string;
+          alt?: string | null;
           position?: number;
           created_at?: string;
         };
@@ -248,6 +250,7 @@ export interface Database {
           id?: string;
           product_id?: string;
           url?: string;
+          alt?: string | null;
           position?: number;
           created_at?: string;
         };
@@ -489,6 +492,7 @@ export interface Database {
           order_number: string;
           user_id: string | null;
           guest_email: string | null;
+          former_account_email: string | null;
           status: Database["public"]["Enums"]["order_status"];
           payment_status: Database["public"]["Enums"]["payment_status"];
           payment_method: string | null;
@@ -514,6 +518,7 @@ export interface Database {
           order_number: string;
           user_id?: string | null;
           guest_email?: string | null;
+          former_account_email?: string | null;
           status?: Database["public"]["Enums"]["order_status"];
           payment_status?: Database["public"]["Enums"]["payment_status"];
           payment_method?: string | null;
@@ -539,6 +544,7 @@ export interface Database {
           order_number?: string;
           user_id?: string | null;
           guest_email?: string | null;
+          former_account_email?: string | null;
           status?: Database["public"]["Enums"]["order_status"];
           payment_status?: Database["public"]["Enums"]["payment_status"];
           payment_method?: string | null;
@@ -853,6 +859,92 @@ export interface Database {
           created_at?: string;
         };
         Relationships: [];
+      };
+      // One row per editable page section. `content` is JSONB whose shape is declared in
+      // src/lib/content/sections.ts, so it stays `Json` here and is narrowed by normaliseValues().
+      site_content: {
+        Row: {
+          key: string;
+          content: Json;
+          is_visible: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          key: string;
+          content?: Json;
+          is_visible?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          key?: string;
+          content?: Json;
+          is_visible?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      faq_categories: {
+        Row: {
+          id: string;
+          title: string;
+          position: number;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          position?: number;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          position?: number;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      faq_items: {
+        Row: {
+          id: string;
+          category_id: string;
+          question: string;
+          /** Plain text with [label](/path) inline links; rendered by RichText. */
+          answer: string;
+          position: number;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          category_id: string;
+          question: string;
+          answer?: string;
+          position?: number;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          category_id?: string;
+          question?: string;
+          answer?: string;
+          position?: number;
+          is_active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "faq_items_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "faq_categories";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       business_settings: {
         Row: {

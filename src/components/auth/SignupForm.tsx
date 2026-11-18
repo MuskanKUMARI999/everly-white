@@ -6,8 +6,12 @@ import { Box, CheckCircle2, Eye, EyeOff, Star, Zap, type LucideIcon } from "luci
 import { Button } from "@/components/ui/Button";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { RequiredField } from "@/components/ui/RequiredField";
-import { COUNTRY_CODES } from "@/components/ui/countryCodes";
-import { signUp } from "@/lib/auth/actions";
+import {
+  COUNTRY_CODES,
+  isValidPhoneDigits,
+  phoneDigitsHint,
+} from "@/components/ui/countryCodes";
+import { signUp, type AuthResult } from "@/lib/auth/actions";
 
 const perks: { Icon: LucideIcon; label: string }[] = [
   { Icon: Box, label: "Order Tracking" },
@@ -20,12 +24,51 @@ const perks: { Icon: LucideIcon; label: string }[] = [
 const compactInputClasses =
   "w-full border border-neutral-200 bg-transparent px-4 py-[clamp(0.375rem,1vh,0.625rem)] font-body text-neutral-500 outline-none transition-colors focus:border-neutral-500 placeholder:text-neutral-200";
 
+// The password rules are checked here, on the client, before signUp() is ever called: the customer
+// sees the message the instant they click, with no round trip. signUp() re-checks all of this —
+// this is a convenience layer, never the gate.
+async function validateThenSignUp(
+  prevState: AuthResult | null,
+  formData: FormData,
+): Promise<AuthResult> {
+  const password = String(formData.get("password") ?? "");
+  const confirmPassword = String(formData.get("confirmPassword") ?? "");
+
+  if (password.length < 8) {
+    return { success: false, message: "Password must be at least 8 characters." };
+  }
+  if (password !== confirmPassword) {
+    return { success: false, message: "Passwords don't match." };
+  }
+
+  // The input already caps the length, so this only catches a number left half-typed.
+  const phoneIso = String(formData.get("phoneCountry") ?? "");
+  const phoneDigits = String(formData.get("phoneNational") ?? "");
+  if (!isValidPhoneDigits(phoneIso, phoneDigits)) {
+    return {
+      success: false,
+      message: `Please enter a valid phone number (${phoneDigitsHint(phoneIso)}).`,
+    };
+  }
+
+  return signUp(prevState, formData);
+}
+
 export function SignupForm() {
-  const [state, action, isPending] = useActionState(signUp, null);
+  const [state, action, isPending] = useActionState(validateThenSignUp, null);
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [countryIso, setCountryIso] = useState("IN");
   const [phone, setPhone] = useState("");
+
+  // Every field is controlled deliberately. React resets an uncontrolled form automatically once a
+  // form action settles, which wiped the name, email and phone a customer had already typed every
+  // time the action came back with an error. Holding the values in state means a rejected submit
+  // leaves the form exactly as they left it, with only the message added.
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // The visible input holds the national number only; the hidden field submitted to signUp
   // prefixes the selected country's dial code so the stored number is unambiguous.
@@ -48,6 +91,8 @@ export function SignupForm() {
           <input
             required
             name="fullName"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
             placeholder="Full Name"
             aria-label="Full Name"
             autoComplete="name"
@@ -60,6 +105,8 @@ export function SignupForm() {
             required
             type="email"
             name="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="Email Address"
             aria-label="Email Address"
             autoComplete="email"
@@ -75,12 +122,18 @@ export function SignupForm() {
           inputClassName={compactInputClasses}
         />
         <input type="hidden" name="phone" value={phone ? `${dialCode} ${phone}`.trim() : ""} />
+        {/* The country and the bare national number travel alongside the combined value so both
+            the client gate above and signUp() can length-check without re-parsing the dial code. */}
+        <input type="hidden" name="phoneCountry" value={countryIso} />
+        <input type="hidden" name="phoneNational" value={phone} />
 
         <div className="relative">
           <input
             required
             type={showPassword ? "text" : "password"}
             name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             aria-label="Password"
             autoComplete="new-password"
@@ -104,6 +157,8 @@ export function SignupForm() {
             required
             type={showPassword ? "text" : "password"}
             name="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Confirm Password"
             aria-label="Confirm Password"
             autoComplete="new-password"
@@ -112,7 +167,9 @@ export function SignupForm() {
         </RequiredField>
 
         {state?.success === false && (
-          <p className="font-body text-sm text-terracotta">{state.message}</p>
+          <p role="alert" aria-live="polite" className="font-body text-sm text-terracotta">
+            {state.message}
+          </p>
         )}
 
         <label className="flex items-start gap-2.5 font-body text-[clamp(0.6875rem,1.4vh,0.8125rem)] text-neutral-400">

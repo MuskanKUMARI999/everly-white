@@ -5,6 +5,7 @@ import Link from "next/link";
 import { CheckCircle2, Lock, Truck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { inputClasses } from "@/components/ui/inputStyles";
+import { INDIA_PHONE_DIGITS, onlyDigits } from "@/components/ui/countryCodes";
 import { StateSelect } from "@/components/ui/StateSelect";
 import { CollectionEyebrow as Eyebrow } from "@/components/collection/Eyebrow";
 import { formatPrice } from "@/components/sections/productFormat";
@@ -60,6 +61,11 @@ interface CheckoutContentProps {
    * they were still typing their address.
    */
   paymentsConfigured: boolean;
+  /**
+   * True when nobody is signed in. Guests have the Payment section and the pay button locked
+   * until every required field holds a valid value; signed-in customers are left as they were.
+   */
+  isGuest: boolean;
   /** Signed-in customer's address book, already ordered default-first. Empty for guests. */
   savedAddresses: Address[];
   /** Profile details used to prefill the blank form. All empty strings for guests. */
@@ -155,6 +161,7 @@ function SectionHeading({ numeral, title }: { numeral: string; title: string }) 
 
 export function CheckoutContent({
   paymentsConfigured,
+  isGuest,
   savedAddresses,
   contact,
 }: CheckoutContentProps) {
@@ -189,6 +196,17 @@ export function CheckoutContent({
 
   const selectedAddress = savedAddresses.find((a) => a.id === addressChoice) ?? null;
 
+  // Mirrors the checks in handleSubmit, so the section only unlocks once a submit would pass them.
+  const guestFormComplete =
+    /^\S+@\S+\.\S+$/.test(form.email.trim()) &&
+    form.fullName.trim() !== "" &&
+    form.phone.trim().length === INDIA_PHONE_DIGITS &&
+    form.address1.trim() !== "" &&
+    form.city.trim() !== "" &&
+    form.state.trim() !== "" &&
+    /^\d{6}$/.test(form.pin.trim());
+  const paymentLocked = isGuest && !guestFormComplete;
+
   function update<K extends keyof FormState>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
   }
@@ -214,7 +232,11 @@ export function CheckoutContent({
     if (selectedAddress) {
       return {
         fullName: selectedAddress.full_name,
-        phone: selectedAddress.phone,
+        // Addresses saved under the old loose rule can hold "+91 98765 43210" or a spaced number.
+        // Those never pass through the checkout field's own normalisation, so they are trimmed to
+        // the national 10 digits here rather than being rejected by the action with nothing on
+        // screen for the customer to correct.
+        phone: onlyDigits(selectedAddress.phone).slice(-INDIA_PHONE_DIGITS),
         address1: selectedAddress.line1,
         address2: selectedAddress.line2 ?? "",
         city: selectedAddress.city,
@@ -460,9 +482,13 @@ export function CheckoutContent({
                 required
                 name="phone"
                 type="tel"
+                inputMode="numeric"
                 value={form.phone}
-                onChange={(e) => update("phone", e.target.value)}
-                placeholder="Phone Number"
+                // Digits only, capped at 10: this address ships within India (SHIPPING_COUNTRY),
+                // so there is no country selector here and no other length to allow.
+                onChange={(e) => update("phone", onlyDigits(e.target.value).slice(0, INDIA_PHONE_DIGITS))}
+                maxLength={INDIA_PHONE_DIGITS}
+                placeholder={`Phone Number (${INDIA_PHONE_DIGITS} digits)`}
                 aria-label="Phone Number"
                 autoComplete="tel"
                 className={inputClasses}
@@ -531,7 +557,13 @@ export function CheckoutContent({
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
+          <fieldset
+            disabled={paymentLocked}
+            aria-disabled={paymentLocked}
+            className={`flex min-w-0 flex-col gap-4 transition-opacity duration-300 ${
+              paymentLocked ? "pointer-events-none select-none opacity-40" : ""
+            }`}
+          >
             <SectionHeading numeral="iv" title="Payment" />
             <div className="flex items-center gap-3 border border-neutral-100 px-5 py-4">
               <Lock size={18} strokeWidth={1.4} className="shrink-0 text-brown" />
@@ -548,7 +580,14 @@ export function CheckoutContent({
                   ? "You'll be taken to Razorpay's secure payment window once you place your order."
                   : "Payments aren't connected yet, so this is a simulated checkout — nothing will be charged."}
             </p>
-          </div>
+          </fieldset>
+
+          {/* Sits outside the fieldset so it isn't dimmed with the section it explains. */}
+          {paymentLocked && (
+            <p className="-mt-8 font-body text-xs text-brown" aria-live="polite">
+              Complete your contact and shipping details above to continue to payment.
+            </p>
+          )}
 
           {error && (
             <p className="font-body text-sm text-terracotta" role="alert">
@@ -673,7 +712,7 @@ export function CheckoutContent({
               form="checkout-form"
               variant="primary"
               icon={false}
-              disabled={isPending}
+              disabled={isPending || paymentLocked}
               className="mt-6 w-full justify-center"
             >
               {isPending ? "Processing…" : `Pay ${formatPrice(total)} Securely`}

@@ -1,21 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
+import { MultilineText } from "@/components/ui/RichText";
+import { text, type SectionValues } from "@/lib/content/sections";
 import type { BlogPost } from "@/lib/data/blog";
 
 interface JournalProps {
   posts: BlogPost[];
+  content: SectionValues;
 }
 
-export function Journal({ posts }: JournalProps) {
+export function Journal({ posts, content }: JournalProps) {
+  // Nothing published yet means a heading above an empty grid — drop the band instead.
+  if (posts.length === 0) return null;
+
   return (
     <section className="bg-beige-light py-16 sm:py-20">
       <div className="mx-auto max-w-content px-6 sm:px-10 lg:px-10">
         <Reveal className="text-center">
-          <p className="font-heading text-xs uppercase tracking-[0.2em] text-neutral-300">Blog</p>
+          <p className="font-heading text-xs uppercase tracking-[0.2em] text-neutral-300">
+            {text(content, "eyebrow")}
+          </p>
           <h2 className="mx-auto mt-3 max-w-2xl font-heading text-3xl font-light leading-snug text-neutral-500 sm:text-4xl">
-            Embrace the Laid-Back Luxury lifestyle — a peaceful home where emotions elevate beyond
-            the senses.
+            <MultilineText value={text(content, "heading")} />
           </h2>
         </Reveal>
 

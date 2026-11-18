@@ -21,6 +21,7 @@ import {
   type CollectionInfo,
   type CollectionProduct,
 } from "@/components/collection/collectionData";
+import { orderProductMedia } from "@/lib/data/productMedia";
 import { type CatalogProduct } from "./productTypes";
 
 export { productCategories, type CatalogProduct, type ProductCategory } from "./productTypes";
@@ -43,19 +44,20 @@ function mapProductToCatalog(product: ProductWithImages): CatalogProduct {
   // leaves gaps in the sequence, so matching on `position === 1` used to silently lose the hover.
   const hoverImage = orderedImages.find((img) => img.url !== featuredImage)?.url;
 
-  // Every photo, in position order — the PDP gallery leads with the main pair shot and the
-  // lifestyle shot, exactly as the design's galleryImages array does. Skipping positions 0 and 1
-  // here (because they also feed image/hoverImage) dropped the two best photos of every product
-  // and let generic filler images take their slots.
-  const galleryImages = orderedImages.map((img) => ({
-    src: img.url,
-    alt: img.alt ?? product.name,
-  }));
-
-  const videos = (product.product_videos ?? [])
-    .slice()
-    .sort((a, b) => a.position - b.position)
-    .map((video) => video.url);
+  // Every photo and video, in the one order admin arranged them in. The PDP gallery leads with
+  // whatever holds slot 1 — the main pair shot, the lifestyle shot, or a clip. Skipping positions 0
+  // and 1 here (because they also feed image/hoverImage) dropped the two best photos of every
+  // product and let generic filler images take their slots.
+  const galleryMedia = orderProductMedia(product.product_images, product.product_videos).map(
+    (entry) =>
+      entry.kind === "image"
+        ? { type: "image" as const, src: entry.item.url, alt: entry.item.alt ?? product.name }
+        : {
+            type: "video" as const,
+            src: entry.item.url,
+            alt: entry.item.alt ?? `${product.name} video`,
+          },
+  );
 
   return {
     id: product.id,
@@ -84,8 +86,7 @@ function mapProductToCatalog(product: ProductWithImages): CatalogProduct {
     // silently removed its badge and there was no way for the client to move it.
     isFlagship:
       ((product.metadata as Record<string, unknown> | null)?.isFlagship ?? false) === true,
-    galleryImages: galleryImages.length > 0 ? galleryImages : undefined,
-    videos: videos.length > 0 ? videos : undefined,
+    galleryMedia: galleryMedia.length > 0 ? galleryMedia : undefined,
   };
 }
 
@@ -105,16 +106,22 @@ function mapCollectionToCollectionInfo(
     // The table has no hero_image_alt column, so the descriptive alt text lives in metadata
     // alongside eyebrow/intro/stats. Falling back to the bare title loses the description.
     heroImageAlt: (metadata.heroImageAlt as string) ?? collection.title,
-    intro: (metadata.intro as CollectionInfo["intro"]) ?? {
-      heading: collection.title,
-      paragraphs: collection.description ? [collection.description] : [],
+    // The three small-caps lines and the founder photo were hardcoded in the page component until
+    // they became editable in Admin → Collections. The defaults below are that original copy, so a
+    // collection saved before the fields existed still reads exactly as it did.
+    storyEyebrow: (metadata.storyEyebrow as string) ?? "The Story",
+    // Field by field, not whole-object: an intro saved with a blank heading used to render an empty
+    // <h2>, because the presence of the `intro` key alone was enough to skip the fallback.
+    intro: {
+      heading: (metadata.intro as CollectionInfo["intro"])?.heading || collection.title,
+      paragraphs: (metadata.intro as CollectionInfo["intro"])?.paragraphs?.length
+        ? (metadata.intro as CollectionInfo["intro"]).paragraphs
+        : collection.description
+          ? [collection.description]
+          : [],
     },
     stats: (metadata.stats as CollectionInfo["stats"]) ?? [],
-    founderNote: (metadata.founderNote as CollectionInfo["founderNote"]) ?? {
-      heading: "Founder's Note",
-      quote: "",
-      attribution: "Everly White Studios",
-    },
+    shopEyebrow: (metadata.shopEyebrow as string) ?? "Shop the Collection",
     products,
   };
 }

@@ -12,7 +12,7 @@ import { resetPassword } from "@/lib/auth/actions";
 const compactInputClasses =
   "w-full border border-neutral-200 bg-transparent px-4 py-[clamp(0.375rem,1vh,0.625rem)] font-body text-neutral-500 outline-none transition-colors focus:border-neutral-500 placeholder:text-neutral-200";
 
-export function ForgotPasswordForm() {
+export function ForgotPasswordForm({ notice }: { notice?: string }) {
   const [state, action, isPending] = useActionState(resetPassword, null);
 
   if (state?.success) {
@@ -33,6 +33,15 @@ export function ForgotPasswordForm() {
 
   return (
     <>
+      {notice && (
+        <p
+          role="status"
+          className="mb-[clamp(0.375rem,1.2vh,0.75rem)] border border-neutral-100 bg-pink-100/40 px-4 py-3 font-body text-[clamp(0.6875rem,1.4vh,0.8125rem)] text-neutral-400"
+        >
+          {notice}
+        </p>
+      )}
+
       <form action={action} noValidate className="flex flex-col gap-[clamp(0.375rem,1.2vh,0.75rem)]">
         <RequiredField>
           <input

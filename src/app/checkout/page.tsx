@@ -25,6 +25,7 @@ export default async function CheckoutPage() {
   return (
     <CheckoutContent
       paymentsConfigured={paymentsConfigured}
+      isGuest={!user}
       savedAddresses={savedAddresses}
       contact={{
         email: user?.email ?? "",

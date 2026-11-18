@@ -5,8 +5,10 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CollectionEyebrow as Eyebrow } from "@/components/collection/Eyebrow";
 import { inputClasses } from "@/components/ui/inputStyles";
+import { PhoneInput } from "@/components/ui/PhoneInput";
+import { COUNTRY_CODES, parseStoredPhone } from "@/components/ui/countryCodes";
 import { updateProfile, type FormResult } from "@/lib/auth/profile-actions";
-import { changePassword } from "@/lib/auth/actions";
+import { changePassword, deleteAccount } from "@/lib/auth/actions";
 
 const labelClasses =
   "mb-1.5 block font-heading text-[11px] uppercase tracking-[0.1em] text-neutral-500";
@@ -87,6 +89,75 @@ function ChangePasswordForm() {
   );
 }
 
+// Hidden behind a first click so the destructive form isn't sitting open on the page; the server
+// action still re-checks the password and the typed confirmation.
+function DeleteAccountForm() {
+  const [state, action, isPending] = useActionState(deleteAccount, null);
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <div className="mt-6">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="cursor-pointer font-heading text-[12px] uppercase tracking-[0.1em] text-terracotta underline underline-offset-4 transition-opacity hover:opacity-70"
+        >
+          I want to delete my account
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <form action={action} className="mt-8 flex flex-col gap-5">
+      <div>
+        <label htmlFor="deletePassword" className={labelClasses}>
+          Your Password
+        </label>
+        <input
+          id="deletePassword"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          required
+          className={inputClasses}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="deleteConfirmation" className={labelClasses}>
+          Type DELETE to confirm
+        </label>
+        <input
+          id="deleteConfirmation"
+          name="confirmation"
+          type="text"
+          autoComplete="off"
+          required
+          pattern="DELETE"
+          className={inputClasses}
+        />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-4 pt-2">
+        <Button type="submit" variant="primary" disabled={isPending} icon={false}>
+          {isPending ? "Deleting…" : "Delete My Account"}
+        </Button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          disabled={isPending}
+          className="cursor-pointer font-body text-sm text-neutral-300 transition-colors hover:text-brown"
+        >
+          Cancel
+        </button>
+        <FormMessage state={state} />
+      </div>
+    </form>
+  );
+}
+
 export function AccountDetailsContent({
   fullName,
   email,
@@ -97,6 +168,15 @@ export function AccountDetailsContent({
   phone: string;
 }) {
   const [state, action, isPending] = useActionState(updateProfile, null);
+
+  // Seeded from the stored "+91 9876543210" so the selector opens on the country already saved.
+  // This is the account's contact number, not a shipping one, so it keeps the full country list —
+  // unlike checkout and the address book, which are India-only because the shop ships there only.
+  const stored = parseStoredPhone(phone);
+  const [countryIso, setCountryIso] = useState(stored.iso);
+  const [national, setNational] = useState(stored.national);
+
+  const dialCode = COUNTRY_CODES.find((c) => c.iso === countryIso)?.dial ?? "";
 
   return (
     <div>
@@ -144,13 +224,21 @@ export function AccountDetailsContent({
           <label htmlFor="phone" className={labelClasses}>
             Phone Number
           </label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            defaultValue={phone}
-            className={inputClasses}
+          <PhoneInput
+            countryIso={countryIso}
+            onCountryIsoChange={setCountryIso}
+            number={national}
+            onNumberChange={setNational}
+            inputClassName={inputClasses}
+            required={false}
           />
+          <input
+            type="hidden"
+            name="phone"
+            value={national ? `${dialCode} ${national}`.trim() : ""}
+          />
+          <input type="hidden" name="phoneCountry" value={countryIso} />
+          <input type="hidden" name="phoneNational" value={national} />
         </div>
 
         <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -170,6 +258,18 @@ export function AccountDetailsContent({
           you.
         </p>
         <ChangePasswordForm />
+      </section>
+
+      <section className="mt-14 max-w-xl border-t border-neutral-100 pt-10">
+        <h2 className="font-heading text-sm uppercase tracking-[0.14em] text-terracotta">
+          Delete Account
+        </h2>
+        <p className="mt-2 font-body text-sm text-neutral-300">
+          Permanently delete your account, saved addresses and wishlist. This can&rsquo;t be undone.
+          You&rsquo;re welcome to sign up again later with the same email, but it will be a new,
+          empty account.
+        </p>
+        <DeleteAccountForm />
       </section>
     </div>
   );
